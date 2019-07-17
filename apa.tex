@@ -6,13 +6,13 @@
 \title{Development of a Domain Specific IDE and JavaScript Comparison Engine for Tomorrow}
 \shorttitle{APA style}
 
-\author{Greg Mitten}
+\author{Gregory Mitten}
 \affiliation{University of Sussex}
 
 \abstract{Tomorrow is a Copenhagen based start-up attempting to reduce the effects of climate change with their new mobile application, a prerequisite for the application to see widespread use is contributions from members of the open-source community. This project attempts to aid their efforts by easing development for volunteer engineers, in the hope of increasing the number of "integrations" developed.  The project provides a domain-specific IDE eliminating configuration and providing a wealth of information to these volunteer engineers. Additionally, as all integrations share a common task, a JavaScript comparison engine is provided to identify similarities in the integration code. It is hoped that this can both inform volunteer engineers about how to overcome certain technical problems as well as allowing Tomorrow engineers to extract often repeated code, into easy to use templates where applicable.}
 
-\rightheader{APA style}
-\leftheader{Greg Mitten - University of Sussex}
+\rightheader{Advanced Computer Science - Department of Informatics}
+\leftheader{Gregory Mitten - University of Sussex}
 
 \begin{document}
 \maketitle    
@@ -145,7 +145,18 @@ These items are to be ignored indiscriminate of circumstance as to never impact 
 JeSSE will not attempt to test if two excerpts are strictly semantically equivalent. In this context,  strict semantic equivalence means that code excerpt a and b perform the same operations in the same order. Instead, semantic similarity is used, JeSSE aims to determine if two code excerpts are similar in their contents rather than entirely identical, as this will very seldom be the case. One of the primary reasons for using this loose definition is interface functions necessarily interact with an external, potentially proprietary system to retrieve their data. It is naive to assume that because two API endpoints appear to be similar they perform similar operations. 
 All instructions that can potentially be called inside a method must be included, this is to say the nodes are collected regardless of conditional control structures. The engine must additionally support function inlining, elaborated upon later.
 
-Results are presented in Table~\ref{tab1}.
+\subsection{Approach}
+AST-based comparison was judged to be more suitable for this criteria as Feng et al mentioned location independence is ineffective in token-based systems. A structural based approach is also employed, the literature suggests this is more effective than its attribute-counting based counterpart. As this metric is not used internally to generate a binary condition like many of these tools the metric generated should be understandable by a developer with no background in code similarity.
+
+\section{Implementation}
+\subsection{Preprocessing}
+The code is first parsed into an AST, many JavaScript parsers are available however as babel is a de facto standard for transpiling ES2015+ code into the "ubiquitously" executable deprecated version (ES2015). If the project aims to support all JavaScript the babel parser should be used, as babel is actively updated for new JavaScript features, somewhat future-proofing the system. Once parsed all root-level functions are extracted from the AST,  in a well-formed integration this will include the interface functions and any member functions they call. All function nodes are preprocessed individually.
+
+Each function is then recursively “flattened” from a tree into a list of its nodes, this is for ease of with the transformation of each tree into a structure in which they can easily be compared. This list includes each node and all their children but once the children are extracted from a node and added to the list they are removed from the node itself. Tree flattening takes into account all control structures, inner function to any degree of nesting. 
+
+\subsubsection{Tree Flattening}
+
+
 \begin{table}[!htb]
 \caption{Sample table.}\label{tab1}
 \begin{tabular}{ccc}
