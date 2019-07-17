@@ -1,0 +1,164 @@
+\documentclass[jou,apacite]{apa6}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\title{Development of a Domain Specific IDE and JavaScript Comparison Engine for Tomorrow}
+\shorttitle{APA style}
+
+\author{Greg Mitten}
+\affiliation{University of Sussex}
+
+\abstract{Tomorrow is a Copenhagen based start-up attempting to reduce the effects of climate change with their new mobile application, a prerequisite for the application to see widespread use is contributions from members of the open-source community. This project attempts to aid their efforts by easing development for volunteer engineers, in the hope of increasing the number of "integrations" developed.  The project provides a domain-specific IDE eliminating configuration and providing a wealth of information to these volunteer engineers. Additionally, as all integrations share a common task, a JavaScript comparison engine is provided to identify similarities in the integration code. It is hoped that this can both inform volunteer engineers about how to overcome certain technical problems as well as allowing Tomorrow engineers to extract often repeated code, into easy to use templates where applicable.}
+
+\rightheader{APA style}
+\leftheader{Greg Mitten - University of Sussex}
+
+\begin{document}
+\maketitle    
+                        
+\section{Introduction}
+\subsection{Problem}
+\subsubsection{Context}
+Tomorrow\textquotesingle s new mobile application also named tomorrow, is soon to enter its beta. The application aims to quantify the carbon impact of everyday actions, allowing users to comprehensively track their impact on the environment. How can tomorrow hope to handle all these vastly heterogeneous interaction modalities the user has transitively with the environment? Tomorrow is relying on open source community to build what are known as "integrations".
+
+An integration is a suite of functions that connect to and retrieve data from a service, then parse it to match a schema. This integration can then be used by tomorrow to display the impact of said action(s) both graphically and textually. It should be evident that the development of integrations are a necessary requisite step for the application to see wide use. Hence it is pivotal an integration should be convenient and trivial to develop, as not to deter any potential volunteer engineers.
+\subsubsection{Definition}
+Currently, in order for volunteer engineers to test their integrations, they must run a server locally which provides limited feedback and capabilities. This project’s aim is to reduce the initial discomfort, confusion and workload often present when beginning development on a system. The desired effect of this is to increase both the number of volunteer engineers and the volunteer engineer retention rate.
+
+\subsection{Proposed Solution}
+This project focuses on a technical route of achieving this outcome, attempting to automate the "toil" (Beyer et al, 2016) of integration development.  Transpiling, hot loading, executing, rendering results, handling environment variables et cetera. The idea is to eliminate the rigmarole often involved in project configuration, providing a pre-configured IDE with live servers ready to execute volunteer engineer code. 
+
+Additionally, there are a finite number of discrete ways to develop the interface functions (connect, collect and disconnect). Meaning there will likely be a great deal of similarity between integrations. Necessarily the greater the integration count the greater the chance two of which are similar, and with Tomorrow anticipating over 100 integrations in an optimistic scenario we would expect a number of them to be very similar in places. Because of this, a code similarity engine is planned to allow Tomorrow and volunteer engineers to identify and learn from similar integrations. The volunteer engineers could use this to learn and fix their integrations, whereas the Tomorrow engineers may be able to, over time, refine their interface functions or add templates to further trivialise integration development.
+
+\subsection{Relevance}
+As much of modern software has moved from the desktop to the web, some are left questioning why the desktop IDE is still so widely used by developers, a group who by all means should be ahead of the curve. There are, of course, concerns that web applications cannot hope to provide the computational power necessary but attaching a cloud server could overcome this problem. It hoped throughout the development of this project provides a greater understanding of the limitations and boons of web-based IDE systems. 
+
+Finally, although there is a much literature on code plagiarism detection and the modern IDE often provides information about when the code is duplicated. There seems to be a lack of focus on identifying similar but not equivalent code. It is often joked about that the contemporary software developer should concern themselves more with the literacy of sites like StackOverflow than they should with code. The reason this statement holds so much truth is software developers infrequently solve a unique problem. Although specific domain details make one problem superficially different, these are often easily identified by developers. It is hoped that this similarity identifying technology touches on an area largely unexploited, identifying similar code. In the future, this could be the basis of a JavaScript template engine facilitating the expedition of feature development. Many large technology companies use such technology internally but as of yet, there is surprisingly not widespread use of these techniques in other spheres.
+
+In this scenario instead of thousands of developers coding solutions to many different problems, we instead see a small number of volunteer engineers all solving essentially the same problems with different solutions. Due to the hyper-specificity provided by the tomorrow integration development microcosm, there is a significant problem relaxation, it is hoped enough so that a similarity identification tool will prove useful.
+
+\subsection{Objectives}
+The project focuses on two discrete areas, one of which is developing an IDE Web Application that eliminates all toil for volunteer engineers and can be used throughout tomorrow\textquotesingle s lifecycle, the Tomorrow IDE (TIDE).
+
+The other domain is developing a performant code similarity tool. The JavaScript Comparison Engine (JeSSE), JavaScript is the language all integrations must be developed in.
+
+\section{Background}
+\subsection{Code Similarity}
+There is a wealth of literature in code similarity with much of it focussing on detecting plagiarism, although the intent behind detecting code similarities may be vastly different from TIDE pragmatically there is little difference in technique. Often plagiarism detection is concerned with being fooled or deceived, JeSSE does not share this concern as integrations are not assessed,  hence worries of deliberate obfuscation are misplaced. Furthermore, the comparison scope is large for many of these tools often spanning university-wide and/or including previous years, whereas JeSSE will be used in a much more confined space. Regardless code plagiarism literature is regarded as extremely relevant.
+
+Duri\`c \& Gašević (2013) enumerate several of the potential false flags involving lexical and structural code similarity, the relevant items for each are enumerated below.
+
+Lexical
+\begin{itemize}
+  \setlength\itemsep{-0.5em}
+  \item Modification of source code formatting 
+  \item Renaming of identifiers
+  \item Addition, modification or deletion of modifiers
+  \item Modification of constant values
+\end{itemize}
+
+Structural
+\begin{itemize}
+  \setlength\itemsep{-0.5em}
+  \item Changing the order of statements within code blocks
+  \item Reordering of code blocks
+  \item Modification of control structures
+  \item Method inlining and method refactoring
+\end{itemize}
+
+Duri\`c \& Gašević follow a token-based analysis and use RKR-GST - Efficient randomized pattern-matching algorithms (Karp \& Rabin, 1987). This searches for longest contiguous match greater than a minimum value and then marks it as to avoid duplication. Additionally, they make use of The Winnowing algorithm. 
+This algorithm strips white spaces and forms n-grams from their hashes, these are then checked for a certain amount of overlap, for each value the hash with the lowest overlap is selected as representative. This reduces the number of hash values facilitating for greater efficiency in substring detection. They combine the results of these algorithms to retrieve a final similarity value.
+
+Lancaster \& Culwin (2004) complete a review of many source code plagiarism tools, they delineate plagiarism tools into two categories. Structure metric systems where every submission is extracted down to a vector of representative numbers and attribute counting systems, where certain attributes (such as identical values) are counted. Verco \& Wise (1996) found attribute counting systems to have greater accuracy when the programs were very similar however they were unable to detect partial plagiarism and overall the performance metrics for structural metric systems were much greater. 
+
+Although it appears that many plagiarism identifiers are based on Token comparison there is an alternate approach in newer literature which involves a strategy of AST comparison. Feng et al (2013) suggest that token-based comparison is unable to effectively detect if the order of tokens has been rearranged, this problem does not occur in AST based comparison. Feng et al use an algorithm called AST-CC to hash nodes and compare the hash of each node with each other node with the same number of child nodes.Zhao et al 2015 also opt to use an AST-based approach, in order to compare these nodes, they first transform the AST into a group into a linear list and then into a group of subtrees based on the number of child nodes. Once this is complete they also use the AST-CC algorithm over it for comparison. Their AST-CC hash function includes only the type and children of each node omitting other comparison considerations but certainly a more efficient solution for scale.
+
+It has been found so far that comparison techniques unanimously use hashing for the comparison of nodes, however, it is believed, that this hashing although providing greater for comparison efficiency, ultimately obfuscates the weighting of "difference types". Should the same type of element edited greatly provide a greater similarity than if it was removed entirely? This consideration and many others can be accounted for by using seperate penalisation values for each difference type, rather than tweaking a hashing algorithm. Tuning the algorithms weights to provide more accurate similarity appears to be a powerful tool that needs to be considered. It should also be noted all of these previous tools were developed as plagiarism tools, as mentioned encountering slightly different problems. 
+\subsection{Similarity Evaluation}
+
+In order to compare the effectiveness of plagiarism detection systems many researchers employ other well-established systems, Duri\textbackslash{}`\'{c} \textbackslash{}\& Ga\v{s}evi\'{c} use Measure Of Software Similarity (MOSS) (Aiken, 2018). Research from Engels et al (2007) found MOSS to be the most effective plagiarism system when utilised neural networks to assess the performance of 12 different engines, MOSS also invented the aforementioned Winnowing algorithm (Aiken et al, 2003) which is employed in MOSS. However, in order for MOSS\textquotesingle s values to have any meaning, the project must first be analysed to determine if it\textquotesingle s inner workings apply to this scenario.
+
+MOSS is white space insensitive, suppresses noise by ignoring trivially short k-grams and position-independent. MOSS does not opt to remove identifiers but instead replaces all identifiers with the character \textquotedblleft{}V\textquotedblright{}, but MOSS is sensitive to comments. Additionally MOSS uses asymmetric comparison, i.e. compare(a,b) does not necessarily have to yield the same result as compare(b,a). 
+
+\subsubsection{The Issue of Similarity}
+Code similarity is not objective, although it may be asserted that two pieces of identical code are very similar, how many changes can one make before this similarity is lost? Plagiarism scarcely addresses this issue and instead defers to alternate plagiarism systems to provide answers, however, if other plagiarism systems are somewhat unsuccessful using as  a baseline is counterproductive. Krinke (2002) discusses a solution to this issue, in order to tune his code similarity engine he used a list of code excerpts with code duplication and then manually checked whether they were duplicates. Although this is somewhat hazier in the example of similarity manual checking must be used.
+
+\subsection{Web IDEs}
+The idea of an online IDE is far from a new one, many companies already offer this service: codesandbox.io, codepen and JSFiddle to name a few. However, typically these environments are for prototyping and experimenting rather than developing complete projects. Much of the literature involving remote code execution has a heavy focus on how secure systems are, this is not so much a concern with TIDE as there no sensitive data accessible or even associated with the system. However, previous solutions will be analysed to derive a set of best practices and technology considerations.
+
+Timo et al (2011) preach the benefits of an online IDE, namely the developer need not worry about configuring or updating the environment. They continue to suggest the use of a development server in which the code can be stored and ran on. In this case, they opt to use a Java Servlet to fulfil this role.
+
+A solution that aims to provide a comprehensive IDE experience in the browser is codeanywhere (2019), the system works by providing each user with their own containerised virtual machine with dedicated memory and storage. This VM can be fully customised and set up with many development stacks and offering over 120 languages. As impressive as this solution may be spinning up a virtual machine for each volunteer developer this appears to be excessive for TIDE's scenario. 
+
+Malan (2013) documents his approach to developing a web IDE for students attending programming modules at Harvard University, known as CS50. CS50 is a much less distant scenario than a fully-fledged IDE  replacement and has many features akin to the requirements of TIDE. However, it does aim to provide many languages rather than just JavaScript. CS50 is built with NodeJS as its event-driven architecture is well-suited to handle asynchronous demands. Many developers may be concerned that a web IDE would incur non-trivial latency issues, enough so to make it worth using an offline alternative. Malan addressed this concern with the use of WebSockets for continuous interaction between server and client.
+
+Goldman et al (2011) developed a collaborative web IDE, they opted to import their text-based portion of the IDE in its entirety rather than engineering their own, this is very much applicable to TIDE. Building a web input for code complete with autocomplete and syntax highlighting would take up a great deal of development time and hence one of the alternatives they offer may be used. 
+
+\section{System Decisions}
+\subsection{Frontend Technology}
+Choosing the frontend technology was fairly unimportant, the primary consideration was maintainability for Tomorrow engineers, its capacity to support WebSockets and a library that functions as a code editor. JavaScript is the most widely used frontend language but a number of JavaScript frameworks met these criteria. As Tomorrow develop their application in ReactNative it logically followed to use ReactJS for maintainability purposes. 
+\subsubsection{Editor}
+Considering the number of online code playgrounds it is somewhat surprising how few are available to be integrated into another project, many of these systems do not provide any autonomy into another environment. However, Microsoft has open-sourced their editing engine for VSCode, Monaco Editor, this has been imported and integrated into the frontend. 
+\subsection{Backend Technology}
+One of the most important considerations for the backend was how it handles the execution of JavaScript code, all languages except JavaScript itself must execute JavaScript with an external tool such as Google’s V8 interpreter (used in their browser Google Chrome) alternatively code can be executed using a node in the command line. It was deemed sensible to skip the middle man especially as node's non-blocking architecture combines with WebSocket best practices fluidly. The WebSocket framework chosen was socket.io as this is used in tomorrow, for ease of maintainability.
+\subsection{Comparison Specification}
+Taking into consideration the literature review the final specification of the code comparison is as follows. The comparison engine ignores the following aspects of code.
+
+\begin{itemize}
+  \setlength\itemsep{-0.5em}
+  \item Location Data
+  	\begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item It is regarded as unlikely that exactly the same operations take place in exactly the same place, this does not mean that these items are code should not be considered similar. Not every operation is hyper dependent on its placement.
+		\item Location independence in this circumstance includes lines positions relative to each other and row and column numbers.
+
+	\end{itemize}
+  \item Identifier names
+  \begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item This is common in plagiarism detection as to deceitful and artificially differentiate the copied code, however this is still very much relevant to volunteer engineers.
+		\item Although there may be some similarities in the naming of functions many identical variables and functions may be given entirely different names and should not be penalised in similarity score due to this.
+	\end{itemize}
+  \item Comments
+  	\begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item Comments have no effect on execution 
+		\item Comments included in the template code to explain each method are likely to lead to false positives.
+	\end{itemize}
+  \item Literal values
+  	\begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item Fetching data from different APIS will always involve different access strings, penalising similarity values here in nonsensical 
+		\item In other circumstances volunteer engineers may receive their data in a different measurement and need to transform it will involve different numbers but are essentially the same and still useful to learn from
+		\item Despite the fact that JavaScript is a dynamically typed language literals preserve their type information, this is the only information that should be stored about a value
+	\end{itemize}
+	\item Logging
+	\begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item Logging should have no effect on execution
+	\end{itemize}
+\end{itemize}
+
+These items are to be ignored indiscriminate of circumstance as to never impact similarity calculation. 
+
+JeSSE will not attempt to test if two excerpts are strictly semantically equivalent. In this context,  strict semantic equivalence means that code excerpt a and b perform the same operations in the same order. Instead, semantic similarity is used, JeSSE aims to determine if two code excerpts are similar in their contents rather than entirely identical, as this will very seldom be the case. One of the primary reasons for using this loose definition is interface functions necessarily interact with an external, potentially proprietary system to retrieve their data. It is naive to assume that because two API endpoints appear to be similar they perform similar operations. 
+All instructions that can potentially be called inside a method must be included, this is to say the nodes are collected regardless of conditional control structures. The engine must additionally support function inlining, elaborated upon later.
+
+Results are presented in Table~\ref{tab1}.
+\begin{table}[!htb]
+\caption{Sample table.}\label{tab1}
+\begin{tabular}{ccc}
+\hline\\[-1.5ex]
+AAA & BBB & CCC \\[0.5ex]
+\hline\\[-1.5ex]
+1.0 & 2.0 & 3.0\\[0.5ex]
+1.0 & 2.0 & 3.0\\[0.5ex]
+\hline
+\end{tabular}
+\end{table}
+
+
+\bibliography{sample}
+
+\end{document}
