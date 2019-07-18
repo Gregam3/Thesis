@@ -2,9 +2,53 @@
 \usepackage{textcomp}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{upgreek}
+\graphicspath{ {./images/} }
+\usepackage{listings}
+\usepackage{color}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+
+
+%JS definition
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, const, let, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstset{
+   language=JavaScript,
+   backgroundcolor=\color{lightgray},
+   extendedchars=true,
+   basicstyle=\footnotesize\ttfamily,
+   showstringspaces=false,
+   showspaces=false,
+   numbers=left,
+   numberstyle=\footnotesize,
+   numbersep=9pt,
+   tabsize=2,
+   breaklines=true,
+   showtabs=false,
+   captionpos=b
+}
 
 \title{Development of a Domain Specific IDE and JavaScript Comparison Engine for Tomorrow}
-\shorttitle{APA style}
+\shorttitle{TIDE \& JeSSE}
 
 \author{Gregory Mitten}
 \affiliation{University of Sussex}
@@ -152,23 +196,136 @@ AST-based comparison was judged to be more suitable for this criteria as Feng et
 \subsection{Preprocessing}
 The code is first parsed into an AST, many JavaScript parsers are available however as babel is a de facto standard for transpiling ES2015+ code into the "ubiquitously" executable deprecated version (ES2015). If the project aims to support all JavaScript the babel parser should be used, as babel is actively updated for new JavaScript features, somewhat future-proofing the system. Once parsed all root-level functions are extracted from the AST,  in a well-formed integration this will include the interface functions and any member functions they call. All function nodes are preprocessed individually.
 
+\subsubsection{Tree Flattening}
 Each function is then recursively “flattened” from a tree into a list of its nodes, this is for ease of with the transformation of each tree into a structure in which they can easily be compared. This list includes each node and all their children but once the children are extracted from a node and added to the list they are removed from the node itself. Tree flattening takes into account all control structures, inner function to any degree of nesting. 
 
-\subsubsection{Tree Flattening}
+Flattening method takes two parameters, the top level nodes in each function body, and a list of all other member functions this is discussed in function inlining. The nodes types:
+
+\texttt{IfStatement}, \texttt{WhileStatement}, \texttt{ForStatement}, \texttt{DoWhileStatement}, \texttt{FunctionDeclaration}
+
+ are referred to as “deep nodes” as they typically have children.
+
+Deep nodes almost unanimously require leaf node extraction. The algorithm traverses through each node in the tree if children are present the parent node is added to the list and then its children are processed. As JavaScript uses pass by reference to accomplish this the node’s children are deep cloned, once this cloning has taken place the child nodes are then dereferenced in the parent to be cleared by JavaScript’s automatic memory management. The parent node is then added to the list of flat nodes, the child nodes are recursively passed into the flatten algorithm and the result is concatenated with the list. 
+
+Other statements, such as lambda expressions, may also be deep nodes but they have a different structure. These nodes must pass a gauntlet of cascading conditions as there is so much diversity in the node structure there is no one simple condition to determine whether children are present. For example, if a node has a consequent, there is no certainty that consequent has a body and even if a consequent's body is present it may be empty. When a node succeeds in passing these conditions their children are extracted in the same fashion as deep nodes, but simply referring to a different route to the body. 
 
 
-\begin{table}[!htb]
-\caption{Sample table.}\label{tab1}
-\begin{tabular}{ccc}
-\hline\\[-1.5ex]
-AAA & BBB & CCC \\[0.5ex]
-\hline\\[-1.5ex]
-1.0 & 2.0 & 3.0\\[0.5ex]
-1.0 & 2.0 & 3.0\\[0.5ex]
-\hline
+
+In Listing 1 \& 2 exactly the same instructions are called in a semantically equivalent manner but they would yield vastly different similarity results if we were to ignore function inlining. 
+
+\begin{lstlisting}[caption=Function returning call expression]
+function connect() {
+	return getConnection()
+}
+
+function getConnection() {
+	return http.get("https://api.com/get-session/username").execute();
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Function returning contents of previous call expression]
+function connect() {
+	return http.get("https://api.com/get-session/username").execute();
+}
+\end{lstlisting}
+
+Once function inlining is performed the resulting code bears a much greater resemblance, seen in Listing 3. JeSSE does not execute the code and so even though line 3 is unreachable it is still processed.
+
+\begin{lstlisting}[caption=Function returning contents of previous call expression]
+function connect() {
+	return getConnection()
+	return http.get("https://api.com/get-session/username").execute();
+}
+\end{lstlisting}
+
+Function inlining is limited to member functions as to not exponentially expand the number of nodes being evaluated. In the other case where every method is processed,  the nature of programming abstraction this would almost certainly lead to an enormous number of nodes. This is not considered representative of the integration code, but rather every single operation that takes place within it. 
+
+Each expression is analysed and if it is both (1) a call expression (2) and its method signature is present in the list of functions passed into the flattening method. The method name is then as a key to access the map of all member functions, it will then extract and flatten recursively the body of the called function. The result is the concatenation of the current list of nodes with the expression followed by the contents of the member function called. A function’s body can only be added to the list once per interface function, in the same manner, that the contents of a for loop are once rather than the number of times the loop iterates. 
+
+As the list is not a list of every node called, rather a unique list of each node that can be called, a function’s body can only be added to the list once per interface function. Consistent with the manner that the contents of a for loop is not added the number of times the loop iterates (if deterministic).
+
+The next phase of preprocessing is to eliminate the nodes that have been determined as irrelevant for comparison, which here only includes logging nodes. JeSSE has several specific logging method signatures hardcoded, the flattened node list is scanned and for call expressions matching these signatures dereferencing any matches.
+
+Finally although some similarity tools replace information they do not want accounted for with a consistent token and others opt to simply ignore these components in their comparisons. JeSSE instead eliminates this information from the nodes entirely by dereferencing it, meaning all data in the remaining structure is to be considered. This must occur last as previous phases rely on this information. 
+
+This completes pre-processing, Figure 1 \& 2 are examples of pre-preprocessing and post-preprocessing respectively.
+
+\begin{figure}[h]
+\caption{Parsed AST}
+\centering
+\includegraphics[width=0.5\textwidth]{ast1}
+\end{figure}
+
+\begin{figure}[h]
+\caption{The AST after preprocessing}
+\centering
+\includegraphics[width=0.50\textwidth]{ast2}
+\end{figure}
+
+\subsection{Comparing Function Bodies}
+In order to compare function bodies, each node must find the node most similar to itself in the alternate list, node matches are exclusive, meaning each node can match with a maximum of one other node; this is true bilaterally. Once a list of these matches has been compiled the similarity of each can be calculated. The similarity value between any two nodes is calculated using a map of chosen values for each difference type, found in table 1.  The calibration of these values will be discussed later.
+
+Table 1
+\begin{tabular}{l|p{60mm}}
+  \hline
+  Addition & A value is present in the compare
+    node not found in the original node\\
+  \hline
+  Deletion & A value is not present in the compare node that is present in the original node\\
+  \hline
+  Edit & The field is present in both but different values are found\\
+  \hline
+  Array & An array is present in both places but a different number of values are found\\
+  \hline
 \end{tabular}
-\end{table}
 
+Having control of how the system treats each individual difference in terms of the capacity to alter the punishment value is extremely valuable, although node hashing offers greater efficiency it is found lacking in this domain (without the creation of a specific hashing algorithm). On comparison of each node, fields are compared and the corresponding punishment values are applied, the punishment values of each node are summed. Note that although the comparison is similar to each base node can match with a maximum of 1 compare node, but if there are fewer nodes on one side than the other unilateral similarity calculator may say the functions are very similar despite the fact one is much smaller than the other. 
+
+Finding each node’s best match is far less trivial than it seems. If this is done naively the match of one node will prevent all future nodes from matching with that node regardless of whether their similarity is greater than the original match, this only occurs due to the exclusivity of the problem. One solution to this would be to compare these values and if the new node shows greater similarity then return and repeat the process with the initial node. This results in unnecessary processing. The preferred solution that has been chosen is an algorithm developed named "exclusive match".
+
+Exclusive match builds a hierarchy of matches ordered by similarity as the nodes are compared. Each difference is assigned its corresponding value and these are summed to form the similarity value, due to the nature of the parser two ASTs can contain vastly different keys despite not being extremely different in nature on occasion, so an upper boundary has been set as a maximum difference punishment value. Once all hierarchies have been built, the uniqueness of the first item in each hierarchy is then tested for duplicates. If a duplicate is identified a loop is entered, the loop will continually pop the index from the hierarchy with the lower similarity value. This continues until the first index in the current node's hierarchy in the hierarchy it is either: Unique or has the highest similarity value of all it's duplicates.
+
+
+\begin{algorithm}
+\caption{Exclusive Match}\label{euclid}
+\begin{algorithmic}[1]
+\State $hierarchies \gets \textit{[]}$
+\For {each node $n$ in $nodes$}
+	\State $hierarchies \gets \textit{hierarchies + sort(getHierarchy(node, compareNodes))}$
+\EndFor
+
+\For {each hierarchy $h$ in $hierarchies$}
+	\While{$compareResult \neq  0$}
+		\If{$compareResult = 1$}
+		\State $hierarchies[h].pop()$
+		\ElsIf{$compareResult = $-$1$}
+		 \State$hierarchies[compareResult.index].pop()$
+		\EndIf
+		\State $compareResult \gets compare(h, hierarchies)$
+	\EndWhile
+\EndFor
+\Procedure{getHierarchy}{$node$, $compareNodes$}
+\State $hierarchy \gets \textit{[]}$
+\For {each node $cn$ in $compareNodes$}
+	\State $hierarchy \gets \textit{hierarchy + \{getSimilarity(node, compareNodes[cn]), cn\}}$
+	
+\EndFor
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[h]
+\caption{The hierarchies built for each node}
+\centering
+\includegraphics[width=0.50\textwidth]{allhierarchies}
+\end{figure}
+
+\begin{figure}[h]
+\caption{The hierarchies with pruned duplicates}
+\centering
+\includegraphics[width=0.50\textwidth]{hierarchies}
+\end{figure}
 
 \bibliography{sample}
 

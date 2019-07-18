@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.2)  17 JUL 2019 17:06
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.2)  18 JUL 2019 14:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -791,57 +791,193 @@ Package: fontenc 2017/04/05 v2.0i Standard LaTeX package
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1enc.def
 File: t1enc.def 2017/04/05 v2.0i Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
-)) (./apa.aux)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2017/09/02 v2.17a AMS math features
+\@mathmargin=\skip68
+
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks20
+\ex@=\dimen138
+))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+LaTeX Info: Redefining \boldsymbol on input line 28.
+\pmbraise@=\dimen139
+)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count100
+LaTeX Info: Redefining \frac on input line 213.
+\uproot@=\count101
+\leftroot@=\count102
+LaTeX Info: Redefining \overline on input line 375.
+\classnum@=\count103
+\DOTSCASE@=\count104
+LaTeX Info: Redefining \ldots on input line 472.
+LaTeX Info: Redefining \dots on input line 475.
+LaTeX Info: Redefining \cdots on input line 596.
+\Mathstrutbox@=\box37
+\strutbox@=\box38
+\big@size=\dimen140
+LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
+\macc@depth=\count105
+\c@MaxMatrixCols=\count106
+\dotsspace@=\muskip10
+\c@parentequation=\count107
+\dspbrk@lvl=\count108
+\tag@help=\toks21
+\row@=\count109
+\column@=\count110
+\maxfields@=\count111
+\andhelp@=\toks22
+\eqnshift@=\dimen141
+\alignsep@=\dimen142
+\tagshift@=\dimen143
+\tagwidth@=\dimen144
+\totwidth@=\dimen145
+\lineht@=\dimen146
+\@envbody=\toks23
+\multlinegap=\skip69
+\multlinetaggap=\skip70
+\mathdisplay@stack=\toks24
+LaTeX Info: Redefining \[ on input line 2817.
+LaTeX Info: Redefining \] on input line 2818.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count112
+\float@exts=\toks25
+\float@box=\box39
+\@float@everytoks=\toks26
+\@floatcapt=\box40
+)
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks27
+\c@algorithm=\count113
+)
+(/usr/share/texlive/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
+Package: algpseudocode 
+
+(/usr/share/texlive/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
+Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
+Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
+\c@ALG@line=\count114
+\c@ALG@rem=\count115
+\c@ALG@nested=\count116
+\ALG@tlm=\skip71
+\ALG@thistlm=\skip72
+\c@ALG@Lnr=\count117
+\c@ALG@blocknr=\count118
+\c@ALG@storecount=\count119
+\c@ALG@tmpcounter=\count120
+\ALG@tmplength=\skip73
+)
+Document Style - pseudocode environments for use with the `algorithmicx' style
+) (/usr/share/texlive/texmf-dist/tex/latex/was/upgreek.sty
+Package: upgreek 2003/02/12 v2.0 (WaS)
+Package upgreek Info: Using Euler Roman for upright Greek on input line 31.
+\symugrf@m=\mathgroup14
+LaTeX Font Info:    Overwriting symbol font `ugrf@m' in version `bold'
+(Font)                  U/eur/m/n --> U/eur/b/n on input line 38.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count121
+\lst@gtempboxa=\box41
+\lst@token=\toks28
+\lst@length=\count122
+\lst@currlwidth=\dimen147
+\lst@column=\count123
+\lst@pos=\count124
+\lst@lostspace=\dimen148
+\lst@width=\dimen149
+\lst@newlines=\count125
+\lst@lineno=\count126
+\lst@maxwidth=\dimen150
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
+\c@lstnumber=\count127
+\lst@skipnumbers=\count128
+\lst@framebox=\box42
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2015/06/04 1.6 listings configuration
+))
+Package: listings 2015/06/04 1.6 (Carsten Heinz)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
+
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 147.
+) (./apa.aux)
 \openout1 = `apa.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 17.
-LaTeX Font Info:    Try loading font information for OML+txmi on input line 17.
+LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 61.
+LaTeX Font Info:    Try loading font information for OML+txmi on input line 61.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/omltxmi.fd
 File: omltxmi.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for OMS+txsy on input line 17.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 61.
+LaTeX Font Info:    Try loading font information for OMS+txsy on input line 61.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/omstxsy.fd
 File: omstxsy.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for OMX+txex on input line 17.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 61.
+LaTeX Font Info:    Try loading font information for OMX+txex on input line 61.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/omxtxex.fd
 File: omxtxex.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for U+txexa on input line 17.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 61.
+LaTeX Font Info:    Try loading font information for U+txexa on input line 61.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/utxexa.fd
 File: utxexa.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 17.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 61.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 61.
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Try loading font information for T1+txr on input line 17.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Try loading font information for T1+txr on input line 61.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/t1txr.fd
 File: t1txr.fd 2000/12/15 v3.1
 )
-\c@maskedRefs=\count100
+\c@maskedRefs=\count129
 
 (/usr/share/texlive/texmf-dist/tex/latex/apacite/english.apc
 File: english.apc 2013/07/21 v6.03 apacite language file
@@ -884,17 +1020,17 @@ LaTeX Info: Redefining \BHBI on input line 130.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count101
-\scratchdimen=\dimen138
-\scratchbox=\box37
-\nofMPsegments=\count102
-\nofMParguments=\count103
-\everyMPshowfont=\toks20
-\MPscratchCnt=\count104
-\MPscratchDim=\dimen139
-\MPnumerator=\count105
-\makeMPintoPDFobject=\count106
-\everyMPtoPDFconversion=\toks21
+\scratchcounter=\count130
+\scratchdimen=\dimen151
+\scratchbox=\box43
+\nofMPsegments=\count131
+\nofMParguments=\count132
+\everyMPshowfont=\toks29
+\MPscratchCnt=\count133
+\MPscratchDim=\dimen152
+\MPnumerator=\count134
+\makeMPintoPDFobject=\count135
+\everyMPtoPDFconversion=\toks30
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
 
@@ -951,34 +1087,37 @@ e
 File: APAamerican.txt 2012/02/23 v1.25 apa6 configuration for American English
 )
 Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: float package is loaded.
+Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Class apa6 Info: Keywords not defined on input line 18.
-LaTeX Font Info:    Try loading font information for OT1+txr on input line 18.
+\c@lstlisting=\count136
+Class apa6 Info: Keywords not defined on input line 62.
+LaTeX Font Info:    Try loading font information for OT1+txr on input line 62.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/ot1txr.fd
 File: ot1txr.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txmia on input line 18.
+LaTeX Font Info:    Try loading font information for U+txmia on input line 62.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/utxmia.fd
 File: utxmia.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsya on input line 18.
+LaTeX Font Info:    Try loading font information for U+txsya on input line 62.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/utxsya.fd
 File: utxsya.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyb on input line 18.
+LaTeX Font Info:    Try loading font information for U+txsyb on input line 62.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/utxsyb.fd
 File: utxsyb.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyc on input line 18.
+LaTeX Font Info:    Try loading font information for U+txsyc on input line 62.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/utxsyc.fd
 File: utxsyc.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for TS1+txr on input line 23.
+LaTeX Font Info:    Try loading font information for TS1+txr on input line 67.
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/ts1txr.fd
 File: ts1txr.fd 2000/12/15 v3.1
@@ -986,31 +1125,105 @@ File: ts1txr.fd 2000/12/15 v3.1
 
 
 ] [2] [3] [4]
+LaTeX Font Info:    Try loading font information for T1+txtt on input line 204.
+
+
+(/usr/share/texlive/texmf-dist/tex/latex/txfonts/t1txtt.fd
+File: t1txtt.fd 2000/12/15 v3.1
+) [5]
+<./images/ast1.png, id=24, 625.33624pt x 643.40375pt>
+File: ./images/ast1.png Graphic file (type png)
+<use ./images/ast1.png>
+Package pdftex.def Info: ./images/ast1.png  used on input line 256.
+(pdftex.def)             Requested size: 250.77698pt x 258.02452pt.
+
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 256--257
+ [][] 
+ []
+
+<./images/ast2.png, id=26, 811.03pt x 268.00125pt>
+File: ./images/ast2.png Graphic file (type png)
+<use ./images/ast2.png>
+Package pdftex.def Info: ./images/ast2.png  used on input line 262.
+(pdftex.def)             Requested size: 250.77698pt x 82.86687pt.
+
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 262--263
+ [][] 
+ []
+
+
+Overfull \hbox (30.59549pt too wide) in paragraph at lines 268--281
+[]\T1/txr/m/n/10 Table 1 [] 
+ []
+
+
+Overfull \hbox (73.59206pt too wide) in paragraph at lines 294--295
+[] $\OML/txmi/m/it/10 hierarchies \OMS/txsy/m/n/10   []$ 
+ []
+
+
+Overfull \hbox (91.21205pt too wide) in paragraph at lines 310--311
+[] $\OML/txmi/m/it/10 hierarchy \OMS/txsy/m/n/10   []$ 
+ []
+
+<./images/allhierarchies.png, id=27, 549.05125pt x 470.75874pt>
+File: ./images/allhierarchies.png Graphic file (type png)
+<use ./images/allhierarchies.png>
+Package pdftex.def Info: ./images/allhierarchies.png  used on input line 321.
+(pdftex.def)             Requested size: 250.77698pt x 215.01445pt.
+
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 321--322
+ [][] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<./images/hierarchies.png, id=28, 542.025pt x 473.77pt>
+File: ./images/hierarchies.png Graphic file (type png)
+<use ./images/hierarchies.png>
+Package pdftex.def Info: ./images/hierarchies.png  used on input line 327.
+(pdftex.def)             Requested size: 250.77698pt x 219.19472pt.
+
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 327--328
+ [][] 
+ []
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
 No file apa.bbl.
 - LAST -
-Extra skip:7.31998pt
-Left:130.0pt/2.165pt
-Right:122.80002pt/2.045pt
-Output:130.40001pt
-[5] (./apa.aux) ) 
+Extra skip:23.15443pt
+Left:598.1094pt/2.165pt
+Right:574.95497pt/2.165pt
+Output:594.53218pt
+[6 <./images/ast1.png> <./images/ast2.png>] [7 <./images/allhierarchies.png> <.
+/images/hierarchies.png>] (./apa.aux) ) 
 Here is how much of TeX's memory you used:
- 6216 strings out of 492982
- 86336 string characters out of 6134897
- 154424 words of memory out of 5000000
- 9635 multiletter control sequences out of 15000+600000
- 40799 words of font info for 80 fonts, out of 8000000 for 9000
+ 9245 strings out of 492982
+ 125979 string characters out of 6134897
+ 222232 words of memory out of 5000000
+ 12593 multiletter control sequences out of 15000+600000
+ 52441 words of font info for 92 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 43i,7n,40p,1048b,314s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</u
-sr/share/texlive/texmf-dist/fonts/type1/public/txfonts/rtcxr.pfb></usr/share/te
-xlive/texmf-dist/fonts/type1/public/txfonts/rtxr.pfb></usr/share/texlive/texmf-
-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type
-1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utm
-ri8a.pfb>
-Output written on apa.pdf (5 pages, 63275 bytes).
+ 43i,8n,40p,1048b,1147s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc
+/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/rt
+cxr.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/rtxi.pfb></us
+r/share/texlive/texmf-dist/fonts/type1/public/txfonts/rtxmi.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/txfonts/rtxr.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/public/txfonts/rtxsc.pfb></usr/share/texlive/texmf-dist/fonts/t
+ype1/public/txfonts/t1xbtt.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
+c/txfonts/t1xtt.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/t
+xsy.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/txsyc.pfb></u
+sr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/urw/times/utmri8a.pfb>
+Output written on apa.pdf (7 pages, 393560 bytes).
 PDF statistics:
- 41 PDF objects out of 1000 (max. 8388607)
- 28 compressed objects within 1 object stream
+ 86 PDF objects out of 1000 (max. 8388607)
+ 56 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 
