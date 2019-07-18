@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.2)  18 JUL 2019 14:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/Debian) (preloaded format=pdflatex 2019.7.2)  18 JUL 2019 19:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1125,7 +1125,7 @@ File: ts1txr.fd 2000/12/15 v3.1
 
 
 ] [2] [3] [4]
-LaTeX Font Info:    Try loading font information for T1+txtt on input line 204.
+LaTeX Font Info:    Try loading font information for T1+txtt on input line 205.
 
 
 (/usr/share/texlive/texmf-dist/tex/latex/txfonts/t1txtt.fd
@@ -1134,45 +1134,35 @@ File: t1txtt.fd 2000/12/15 v3.1
 <./images/ast1.png, id=24, 625.33624pt x 643.40375pt>
 File: ./images/ast1.png Graphic file (type png)
 <use ./images/ast1.png>
-Package pdftex.def Info: ./images/ast1.png  used on input line 256.
+Package pdftex.def Info: ./images/ast1.png  used on input line 257.
 (pdftex.def)             Requested size: 250.77698pt x 258.02452pt.
 
-Overfull \hbox (9.03374pt too wide) in paragraph at lines 256--257
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 257--258
  [][] 
  []
 
 <./images/ast2.png, id=26, 811.03pt x 268.00125pt>
 File: ./images/ast2.png Graphic file (type png)
 <use ./images/ast2.png>
-Package pdftex.def Info: ./images/ast2.png  used on input line 262.
+Package pdftex.def Info: ./images/ast2.png  used on input line 263.
 (pdftex.def)             Requested size: 250.77698pt x 82.86687pt.
 
-Overfull \hbox (9.03374pt too wide) in paragraph at lines 262--263
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 263--264
  [][] 
  []
 
 
-Overfull \hbox (30.59549pt too wide) in paragraph at lines 268--281
+Overfull \hbox (30.59549pt too wide) in paragraph at lines 269--282
 []\T1/txr/m/n/10 Table 1 [] 
- []
-
-
-Overfull \hbox (73.59206pt too wide) in paragraph at lines 294--295
-[] $\OML/txmi/m/it/10 hierarchies \OMS/txsy/m/n/10   []$ 
- []
-
-
-Overfull \hbox (91.21205pt too wide) in paragraph at lines 310--311
-[] $\OML/txmi/m/it/10 hierarchy \OMS/txsy/m/n/10   []$ 
  []
 
 <./images/allhierarchies.png, id=27, 549.05125pt x 470.75874pt>
 File: ./images/allhierarchies.png Graphic file (type png)
 <use ./images/allhierarchies.png>
-Package pdftex.def Info: ./images/allhierarchies.png  used on input line 321.
+Package pdftex.def Info: ./images/allhierarchies.png  used on input line 322.
 (pdftex.def)             Requested size: 250.77698pt x 215.01445pt.
 
-Overfull \hbox (9.03374pt too wide) in paragraph at lines 321--322
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 322--323
  [][] 
  []
 
@@ -1182,48 +1172,59 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 <./images/hierarchies.png, id=28, 542.025pt x 473.77pt>
 File: ./images/hierarchies.png Graphic file (type png)
 <use ./images/hierarchies.png>
-Package pdftex.def Info: ./images/hierarchies.png  used on input line 327.
+Package pdftex.def Info: ./images/hierarchies.png  used on input line 330.
 (pdftex.def)             Requested size: 250.77698pt x 219.19472pt.
 
-Overfull \hbox (9.03374pt too wide) in paragraph at lines 327--328
+Overfull \hbox (9.03374pt too wide) in paragraph at lines 330--331
  [][] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
+[6 <./images/ast1.png> <./images/ast2.png>] [7 <./images/allhierarchies.png> <.
+/images/hierarchies.png>]
+<./images/codeexecution.png, id=45, 566.115pt x 431.6125pt>
+File: ./images/codeexecution.png Graphic file (type png)
+<use ./images/codeexecution.png>
+Package pdftex.def Info: ./images/codeexecution.png  used on input line 362.
+(pdftex.def)             Requested size: 275.8562pt x 210.31969pt.
+
+Overfull \hbox (34.11296pt too wide) in paragraph at lines 362--363
+ [][] 
+ []
+
+[8 <./images/codeexecution.png>] [9]
 No file apa.bbl.
 - LAST -
-Extra skip:23.15443pt
-Left:598.1094pt/2.165pt
-Right:574.95497pt/2.165pt
-Output:594.53218pt
-[6 <./images/ast1.png> <./images/ast2.png>] [7 <./images/allhierarchies.png> <.
-/images/hierarchies.png>] (./apa.aux) ) 
+Extra skip:5.08131pt
+Left:502.43628pt/2.165pt
+Right:499.39996pt/0.12pt
+Output:504.41812pt
+[10] (./apa.aux) ) 
 Here is how much of TeX's memory you used:
- 9245 strings out of 492982
- 125979 string characters out of 6134897
- 222232 words of memory out of 5000000
- 12593 multiletter control sequences out of 15000+600000
+ 9255 strings out of 492982
+ 126174 string characters out of 6134897
+ 246232 words of memory out of 5000000
+ 12602 multiletter control sequences out of 15000+600000
  52441 words of font info for 92 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 43i,8n,40p,1048b,1147s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texlive/texmf-dist/fonts/enc
-/dvips/base/8r.enc}</usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/rt
-cxr.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/rtxi.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/txfonts/rtxmi.pfb></usr/share/tex
-live/texmf-dist/fonts/type1/public/txfonts/rtxr.pfb></usr/share/texlive/texmf-d
-ist/fonts/type1/public/txfonts/rtxsc.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/public/txfonts/t1xbtt.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/txfonts/t1xtt.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/t
-xsy.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/txsyc.pfb></u
-sr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fo
-nts/type1/urw/times/utmri8a.pfb>
-Output written on apa.pdf (7 pages, 393560 bytes).
+ 53i,8n,47p,1357b,1147s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</
+usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/rtcxr.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/public/txfonts/rtxmi.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/txfonts/rtxr.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/txfonts/rtxsc.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
+ic/txfonts/t1xbtt.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts
+/t1xtt.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/txsy.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/txfonts/txsyc.pfb></usr/share/
+texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-d
+ist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/urw/times/utmri8a.pfb>
+Output written on apa.pdf (10 pages, 487332 bytes).
 PDF statistics:
- 86 PDF objects out of 1000 (max. 8388607)
- 56 compressed objects within 1 object stream
+ 93 PDF objects out of 1000 (max. 8388607)
+ 59 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

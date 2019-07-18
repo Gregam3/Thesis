@@ -83,7 +83,8 @@ Finally, although there is a much literature on code plagiarism detection and th
 In this scenario instead of thousands of developers coding solutions to many different problems, we instead see a small number of volunteer engineers all solving essentially the same problems with different solutions. Due to the hyper-specificity provided by the tomorrow integration development microcosm, there is a significant problem relaxation, it is hoped enough so that a similarity identification tool will prove useful.
 
 \subsection{Objectives}
-The project focuses on two discrete areas, one of which is developing an IDE Web Application that eliminates all toil for volunteer engineers and can be used throughout tomorrow\textquotesingle s lifecycle, the Tomorrow IDE (TIDE).
+The project focuses on two discrete areas, 
+ of which is developing an IDE Web Application that eliminates all toil for volunteer engineers and can be used throughout tomorrow\textquotesingle s lifecycle, the Tomorrow IDE (TIDE).
 
 The other domain is developing a performant code similarity tool. The JavaScript Comparison Engine (JeSSE), JavaScript is the language all integrations must be developed in.
 
@@ -192,7 +193,7 @@ All instructions that can potentially be called inside a method must be included
 \subsection{Approach}
 AST-based comparison was judged to be more suitable for this criteria as Feng et al mentioned location independence is ineffective in token-based systems. A structural based approach is also employed, the literature suggests this is more effective than its attribute-counting based counterpart. As this metric is not used internally to generate a binary condition like many of these tools the metric generated should be understandable by a developer with no background in code similarity.
 
-\section{Implementation}
+\section{JeSSE Implementation}
 \subsection{Preprocessing}
 The code is first parsed into an AST, many JavaScript parsers are available however as babel is a de facto standard for transpiling ES2015+ code into the "ubiquitously" executable deprecated version (ES2015). If the project aims to support all JavaScript the babel parser should be used, as babel is actively updated for new JavaScript features, somewhat future-proofing the system. Once parsed all root-level functions are extracted from the AST,  in a well-formed integration this will include the interface functions and any member functions they call. All function nodes are preprocessed individually.
 
@@ -208,8 +209,6 @@ Flattening method takes two parameters, the top level nodes in each function bod
 Deep nodes almost unanimously require leaf node extraction. The algorithm traverses through each node in the tree if children are present the parent node is added to the list and then its children are processed. As JavaScript uses pass by reference to accomplish this the node’s children are deep cloned, once this cloning has taken place the child nodes are then dereferenced in the parent to be cleared by JavaScript’s automatic memory management. The parent node is then added to the list of flat nodes, the child nodes are recursively passed into the flatten algorithm and the result is concatenated with the list. 
 
 Other statements, such as lambda expressions, may also be deep nodes but they have a different structure. These nodes must pass a gauntlet of cascading conditions as there is so much diversity in the node structure there is no one simple condition to determine whether children are present. For example, if a node has a consequent, there is no certainty that consequent has a body and even if a consequent's body is present it may be empty. When a node succeeds in passing these conditions their children are extracted in the same fashion as deep nodes, but simply referring to a different route to the body. 
-
-
 
 In Listing 1 \& 2 exactly the same instructions are called in a semantically equivalent manner but they would yield vastly different similarity results if we were to ignore function inlining. 
 
@@ -244,8 +243,10 @@ Each expression is analysed and if it is both (1) a call expression (2) and its 
 
 As the list is not a list of every node called, rather a unique list of each node that can be called, a function’s body can only be added to the list once per interface function. Consistent with the manner that the contents of a for loop is not added the number of times the loop iterates (if deterministic).
 
+\subsubsection{Eliminate Irrelevant Nodes}
 The next phase of preprocessing is to eliminate the nodes that have been determined as irrelevant for comparison, which here only includes logging nodes. JeSSE has several specific logging method signatures hardcoded, the flattened node list is scanned and for call expressions matching these signatures dereferencing any matches.
 
+\subsubsection{Eliminate Irrelevant Node Details}
 Finally although some similarity tools replace information they do not want accounted for with a consistent token and others opt to simply ignore these components in their comparisons. JeSSE instead eliminates this information from the nodes entirely by dereferencing it, meaning all data in the remaining structure is to be considered. This must occur last as previous phases rely on this information. 
 
 This completes pre-processing, Figure 1 \& 2 are examples of pre-preprocessing and post-preprocessing respectively.
@@ -283,31 +284,31 @@ Having control of how the system treats each individual difference in terms of t
 
 Finding each node’s best match is far less trivial than it seems. If this is done naively the match of one node will prevent all future nodes from matching with that node regardless of whether their similarity is greater than the original match, this only occurs due to the exclusivity of the problem. One solution to this would be to compare these values and if the new node shows greater similarity then return and repeat the process with the initial node. This results in unnecessary processing. The preferred solution that has been chosen is an algorithm developed named "exclusive match".
 
-Exclusive match builds a hierarchy of matches ordered by similarity as the nodes are compared. Each difference is assigned its corresponding value and these are summed to form the similarity value, due to the nature of the parser two ASTs can contain vastly different keys despite not being extremely different in nature on occasion, so an upper boundary has been set as a maximum difference punishment value. Once all hierarchies have been built, the uniqueness of the first item in each hierarchy is then tested for duplicates. If a duplicate is identified a loop is entered, the loop will continually pop the index from the hierarchy with the lower similarity value. This continues until the first index in the current node's hierarchy in the hierarchy it is either: Unique or has the highest similarity value of all it's duplicates.
+Exclusive match builds a hierarchy of matches ordered by similarity as the nodes are compared. Each difference is assigned its corresponding value and these are summed to form the similarity value, due to the nature of the parser two ASTs can contain vastly different keys despite not being extremely different in nature on occasion, so an upper boundary has been set as a maximum difference punishment value. Once all hierarchies have been built, the uniqueness of the first item in each hierarchy is then tested for duplicates. If a duplicate is identified a loop is entered, the loop will continually pop the index from the hierarchy with the lower similarity value. This continues until the first index in the current node's hierarchy in the hierarchy it is either: Unique or has the highest similarity value of all it's duplicates. Figure 3 represents the first phase where all hierarchies are built, Figure 4 represents
 
 
 \begin{algorithm}
 \caption{Exclusive Match}\label{euclid}
 \begin{algorithmic}[1]
-\State $hierarchies \gets \textit{[]}$
+\State hierarchies $\gets \textit{[]}$
 \For {each node $n$ in $nodes$}
-	\State $hierarchies \gets \textit{hierarchies + sort(getHierarchy(node, compareNodes))}$
+	\State hierarchies.add(sort(match(node, compareNodes))
 \EndFor
 
 \For {each hierarchy $h$ in $hierarchies$}
 	\While{$compareResult \neq  0$}
 		\If{$compareResult = 1$}
-		\State $hierarchies[h].pop()$
+		\State hierarchies[h].pop()
 		\ElsIf{$compareResult = $-$1$}
-		 \State$hierarchies[compareResult.index].pop()$
+		 \State hierarchies[compareResult.index].pop()
 		\EndIf
 		\State $compareResult \gets compare(h, hierarchies)$
 	\EndWhile
 \EndFor
-\Procedure{getHierarchy}{$node$, $compareNodes$}
-\State $hierarchy \gets \textit{[]}$
+\Procedure{match}{$node$, $compareNodes$}
+\State hierarchy $\gets \textit{[]}$
 \For {each node $cn$ in $compareNodes$}
-	\State $hierarchy \gets \textit{hierarchy + \{getSimilarity(node, compareNodes[cn]), cn\}}$
+	\State hierarchy.add(similarity(node, cn.AST), cn.idx)
 	
 \EndFor
 \EndProcedure
@@ -321,11 +322,120 @@ Exclusive match builds a hierarchy of matches ordered by similarity as the nodes
 \includegraphics[width=0.50\textwidth]{allhierarchies}
 \end{figure}
 
+
+
 \begin{figure}[h]
 \caption{The hierarchies with pruned duplicates}
 \centering
 \includegraphics[width=0.50\textwidth]{hierarchies}
 \end{figure}
+
+Upon completion, populated hierarchies are summed and stored including their similarity values. Empty hierarchies are not simply ignored, these items are identified and their count is used as a modifier to multiple S (The similarity value) by (where a lower S represents greater similarity).  
+
+To make $S$ relative to its size of the nodes that generated it the total $S$ of each function is divided by the number of keys present in all of its nodes. Key-count is always directly proportionate to the comparison as deep-diff works on the basis of comparing each individual key in the node. What this does mean however is that more complicated nodes are weighted heavier in the generation of $S$ but this was seen as appropriate.
+
+Once a score is generated for a function in the form \texttt{compare(a, b)} only one side of the comparison has taken place and the system is unilateral. This result is weighted as 50\% and the other half is derived from an inverse comparison for \texttt{compare(b, a)}.
+
+
+The purpose of this transformation is so the engineers perceive the value as a percentage, this should intuitive to the engineers without much thought. Although it should be noted that a $TS$ of 75 is not 75\% similar, it was judged this is representative enough that engineers will get the general idea of the system. JeSSE has been tweaked so an $S$ greater than 1 is seen to be very dissimilar and will be displayed to volunteer and tomorrow engineers alike as 0. If these values are displayed in such a way why even give multiple pieces of code the possibility of having a difference value less than 0? This is because as the most similar integration must still be selected i.e. a dissimilar function of similar length is still considered more similar than the contrary. Providing a $TS$ to the engineer of -56 was judged to be confusing and break the percentage-based illusion, after all how could the code be -56\% similar. $TS$ for each method is displayed alongside a visual indicator of similarity client-side and a copy of the most similar code to allow the developer to inspect it to look for places they could complete their task differently. 
+
+Each method of each integration undergoes the comparison process with the volunteer engineer's code, matching each function to the corresponding interface function. After every function has been assessed the code is imported from the most similar integration for each interface function, to prevent memory leaks these modules must be deleted. First emitted to the client-side to reduce further waiting time and then the modules are removed from the cache.
+
+\section{TIDE Implementation}
+\subsection{Code Execution}
+There are many ways to dynamically execute code in JavaScript, one of which is the notorious \texttt{eval()}, many of the reasons eval is widely disliked is due to its security implications, not particularly concerning to TIDE. However,  it also runs into many efficiency concerns. Meawad et al (2012) posited that \texttt{eval()} is, in almost every scenario, replaceable by a superior alternative, even developing a tool that automatically replaced 97\% of eval usage. There are many alternatives to \texttt{eval}, some are assessed below.
+
+\begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item JavaScript provides a text parameter for its Function class allowing the passing of source code directly into the object, i.e. \texttt{new Function(“console.log(‘test’)”).apply()} prints \texttt{test} in the console. This appears to be a thinly veiled eval it is not quite, the code input here is parsed into a JavaScript Function whereas eval runs the input expression with whatever scope it is called in. The issue with passing code in only functions can be passed in whereas the volunteer developers code entire modules with constants and imports which will not have the correct scope inside a wrapper function.
+		\item Another strategy is by Document Object Model modification, this would involve appending the script to the HTML of the current page their viewing and then running the methods from the JavaScript initially provided, besides the fact this solution is inelegant and would likely be very error-prone there are additional reasons why this should not be used. The first of which is it would require their browser to support the JavaScript they are writing, although this may seem like a reasonable request it is not unlikely some experimental feature is used for some element of their integration that is not supported by many old versions of browsers. Finally, there are numerous modules which may be imported from the Tomorrow project which would be programmatically awkward to selectively provide based on the DOM. 
+		\item Although node.js is a JavaScript framework perhaps it is better practice to write the code to a file stored on the backend and then initiate JavaScript execution via the command line using a tool such as Google’s V8 JavaScript interpreter. However, retrieving the console output is regarded to be inconsistent and cannot possibly be the best solution.
+		\item The final and perhaps only viable idea is to provide the code to the backend, write it to a file, treat the file as a normal module and import it. This must be synchronous of course due to the race condition of the file being populated. But once this is complete the code will be indistinguishable from a module imported on boot, allowing for the full capabilities of a module. Meaning the results do not need to be parsed or converted, they will natively retrieve JSON objects that can be directly sent to the client.
+		
+	\end{itemize}
+	
+			Once the module importing option was decided upon a new problem arose in order to allow execution of all valid JavaScript, the system must support also support ES2015+ syntax. However, node.js does not yet have full native support for all these features (node.js, 2019). Silva et al (2017)  discuss one solution to this is transpiling the code, from ES2015+ to ES2015 as ES2015+ does not add any feature to the language which cannot be replicated in more verbose ES2015, which is fully supported by node.js. However, transpiling comes at a cost, all code must be transformed before execution this is in most cases a trivial issue as all code is transpiled at the beginning. In this circumstance as ES6 features are supported in the IDE every single code execution must be transpiled to ES2015 to run, a non-trivial performance cost. Another and perhaps better solution to this is via the use of ESM, a module loader that transforms ECMAScript2015+ modules at run time rather than transpiling them (Benny, 2018). This can be added to the entire system via simply running the server's root JavaScript file through the ESM module loader rather than directly. The elegance of this solution comes from the issue that the server itself uses ES16+ syntax,  the ESM module loader combats both this and the issue of ES16+ in integrations simultaneously.
+			
+				\begin{figure}[h]
+\caption{The Code Execution flow}
+\centering
+\includegraphics[width=0.55\textwidth]{codeexecution}
+\end{figure}
+			
+			Figure 5 represents the phases each code execution passes through when an execution request is sent from the user. This was achieved using a promise chain, of course, some items on the list are conditional, i.e. a user package is only created if one currently does not exist. The environment is set up as an empty module exporting the fields specified by the user as a JSON Object. Additionally, in order for the stub to have its methods made accessible,  code specifying all interface functions as exports is appended.
+
+All integrations imported with ES2015 dependency management system, rather than with ES16. However, the integrations themselves may import the modules using whichever syntax the volunteer engineer chooses, this is facilitated by the ESM module loader.  ES15+ \texttt{import} statement specifically makes the dependency cache inaccessible during run-time.  Even with ES2015's require, modules are cached and even if it is explicitly stated that the module should be reimported node will simply retrieve this cached version. In order to facilitate dynamic hot-loading multiple times in a session, the system must resolve the cached module and dereference it, it can then be re-imported. 
+
+Once imported the module's interface functions are executed, feeding them arguments identical to what they receive in tomorrow. The \texttt{connect} interface method receives parameters in the form of two functions, the first of which is the app fetches the username and password of the current user. In the IDE the volunteer engineer must instead fill out an authentication panel. The other method requests a web view to be resolved for OAuth, discussed later. 
+
+The outcome of the connect method is stored and then passed as the state parameter into collect, once this is complete the remainder of the operations benefit greatly from node.js's asynchronous nature. The calculation of code similarity, the transformation of the \texttt{collect} result in various representations and fetching the logs takes place simultaneously. These results are emitted to the client.
+\subsection{Miscellaneous Features}
+\subsubsection{Concurrency}
+To allow many volunteer developers to access the system simultaneously, each user will be assigned a unique id as a cookie upon their first entry into the site, this id is used to generate their session package. A user package has all the necessary file components for one to develop: their simulated environment and the module, user packages are persistent as long as their corresponding cookie is, meaning that their code is stored on the server rather than locally on the browser. These ids must be generated in such a way that it is extremely unlikely one user should be able to guess the id of another user to interfere with their integration, because of this a Universally Unique Identifier (UUID) is used.
+
+\subsubsection{Logging and Debugging}
+For TIDE to see any long-form use, it must provide adequate information for debugging. This presents an issue and is clear why a virtual machine is used in the case of some web IDEs, the execution of the code is controlled by a server with a console that is not accessible. If volunteer developers are to have any idea why their code is not behaving as expected, they must have a means of receiving error messages or retrieving values in the program. Execution state, whether successful or otherwise is provided to the volunteer engineer using pop-ups, if no meaning error name can be found the message “an error occurred but not message could be retrieved appears” this was judged to be better than no message at all.
+
+To implement logging a very simple class was made available to the user, they simply import a logger class from the project files (a path is specified in the IDE documentation) and then build a stack of logs by calling functions within the logger. Typical logging levels are provided such as ‘info’, ‘debug’, etc. To access these logs and return them to the client-side, a logger is then added to the export function of the aforementioned module stub. However, due to the fact, the logger's presence is not guaranteed an additional line must be appended to the module exports, the contents of "logger" whether present or not and exports that instead.
+
+\subsubsection{Execution Results}
+Once the user has executed their integration they must be able to view the results, several display formats will be returned to the user. The first of which is a graph mapping the co2 usage over time allowing them to visualise their data as a time-series. Next cumulative co2 emissions will be mapped using an appropriate carbon model (provided by Tomorrow) to see if their results are reasonable. Finally, their data will be returned in raw JSON, the response the programmer might expect to see initially. 
+
+\subsubsection{OAuth}
+Volunteer engineers are able to use OAuth in their integration, this is where the differences in the nature of server-based code execute become more evident. In order to initially resolve the web view to a value, i.e. a session token, the volunteer engineer must often enter values into this web view. This, of course, presents an issue as their code is tested on the node.js server making the volunteer engineer entirely unable to continue this process and leaving the system frozen. 
+
+The OAuth flow was implemented with the use of WebSockets, the request is initially sent via HTTP to the backend which will then begin the execution cycle as normal. Once the connect interface method is called a well-formed OAuth integration authorisation takes place via a web view,  a promise is set up on the server that emits a signal to a receiving client-side WebSocket. On receiving this transmission the client creates a new window using the URL provided by the server, providing a means for the volunteer engineer to enter their authentication information. Once the user has logged in to the window (this can also take place automatically if details are stored) the server-side promise resolves as it receives a response from the client and can continue execution with valid authentication.
+
+\subsubsection{State Injection}
+Some volunteer developers may not want to run the \texttt{connect} component of their system on occasion, this may be to probe the system for a bug or perhaps because their API has a finite number of calls not well-suited to the development of the system. The tomorrow application itself will also rarely authenticate, instead opting to store this information where possible, hence engineers may be interested in testing the more likely circumstance of connection state already existing. 
+
+In a client-side modal, volunteer engineers can specify well-formed JSON (enforced by component) that is passed as a parameter with the code into the server. If this state injection is present the server bypasses the execution of certain features and instead only executes the \texttt{collect} method, using the state provided. This may also be convenient for providing expired tokens for testing.
+
+\subsection{Testing}
+System testing is primarily focussed on the code similarity element of the project. This is a perfect domain for unit testing, the comparison engine produces an output of a float ($S$) indicating the two functions are considered identical. Many of the requirements of JeSSE are specified in such phrasing as “the inclusion of x should not affect the outcome of the comparison”, because of these tests could be created in such a manner. Some such tests include:
+
+\begin{itemize}
+  		\setlength\itemsep{-0.2em}
+		\item Same nodes in a different order
+		\item Same nodes in a different order with some inside control structure 
+		\item If statement child nodes are flattened
+		\item For loop child nodes are flattened
+		\item ... for all deep nodes
+		\item Lambda expression content flattened
+		\item Logging nodes are ignored
+		\item Comments are ignored
+		\item Called functions are inlined
+	\end{itemize}
+
+\section{Hyperparameter Tuning}
+The final phase of optimising JeSSE involves tuning various numeric hyperparameters. (1) The Missing modifier increment, for each missing match increase a modifier by this value, this modifier is ultimately multiplied with the similarity score. This is used as it was judged to be logically more effective in identifying similarity, for every missing line the code becomes less and less likely to be largely similar. (2) Difference values, the similarity punishment value assigned to a specific difference type. (3) The maximum punishment value one node can receive, some nodes can be so expansive punishment values are disproportionate see Listing 4 \& 5.
+
+\begin{lstlisting}[caption=Function returning contents of previous call expression]
+function sleepTest() {
+    let start = new Date().getTime();
+    sleep(1000 * 60 * 60 * 24);
+    return new Date().getTime() - start;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Function returning contents of previous call expression]
+function sleepTest() {
+    let start = new Date().getTime();
+    sleep(86400000);
+    return new Date().getTime() - start;
+}
+
+\end{lstlisting}
+
+If no maximum punishment value is set here, due to the manner that JeSSE recursively evaluates nodes even inside of call expressions this produces an $TS$ of 30, which has been regarded as disproportionately low for such a change. A naive solution to this is to say why not treat all numeric operations and such as one numeric literal, the calculation in listing 4 is trivial and present for clarity sake but in real integrations, it is unlikely all calculations will be deterministic.
+
+The initial tuning attempt involved the code comparisons used to assess the effectiveness of JeSSE vs MOSS (Listings x to y), however, once these were optimised (see table x,y,z) real comparison of integrations were judged to perform poorly. These tests were replaced with integration tests that were judged to perform poorly with the new tuning, however, MOSS performed very poorly here as the integrations are not in anyway plagiarised. So MOSS was dropped as a comparison, due to the problem of similarity a set of heuristics were formed. The first 4 tests must be greater than 1 but ideally as low as possible, the final 3 tests should be as close to 0 as possible.
+
+\subsubsection{Combinatorial Tuning}
+Although there is little doubt an approach of assessing combinatorial parameters thoroughly  would lead to the system functioning more effectively, due to the oracle problem brought about as a result of the problem of similarity an enormous amount of manual work. This will be discussed further later on.
+
+
+
 
 \bibliography{sample}
 
