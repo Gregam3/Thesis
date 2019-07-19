@@ -429,12 +429,229 @@ function sleepTest() {
 
 If no maximum punishment value is set here, due to the manner that JeSSE recursively evaluates nodes even inside of call expressions this produces an $TS$ of 30, which has been regarded as disproportionately low for such a change. A naive solution to this is to say why not treat all numeric operations and such as one numeric literal, the calculation in listing 4 is trivial and present for clarity sake but in real integrations, it is unlikely all calculations will be deterministic.
 
-The initial tuning attempt involved the code comparisons used to assess the effectiveness of JeSSE vs MOSS (Listings x to y), however, once these were optimised (see table x,y,z) real comparison of integrations were judged to perform poorly. These tests were replaced with integration tests that were judged to perform poorly with the new tuning, however, MOSS performed very poorly here as the integrations are not in anyway plagiarised. So MOSS was dropped as a comparison, due to the problem of similarity a set of heuristics were formed. The first 4 tests must be greater than 1 but ideally as low as possible, the final 3 tests should be as close to 0 as possible.
+The initial tuning attempt involved the code comparisons used to assess the effectiveness of JeSSE vs MOSS (Listings x to y) known as Test Suite 1, however, once these were optimised (see table 2,3 \& 4) real comparison of integrations were judged to perform poorly.
 
 \subsubsection{Combinatorial Tuning}
 Although there is little doubt an approach of assessing combinatorial parameters thoroughly  would lead to the system functioning more effectively, due to the oracle problem brought about as a result of the problem of similarity an enormous amount of manual work. This will be discussed further later on.
 
+\subsection{Test Suite 1}
+A test consists of comparison between $n$a and $n$b
+\begin{lstlisting}[caption=Comparison 1a \& 1b - Identical]
+	let x = true;
+\end{lstlisting}
 
+\begin{lstlisting}[caption=Comparison 2a - Let against const]
+	let x = true;
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 2b - Let against const]
+	const x = true;
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 3a \& 3b - Identical extended]
+	let x = true;
+	if (x) {
+		functionCall("here");
+	}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 4a - Effect of numeric literal vs numberic expression]
+	let x = true;
+	if (x) {
+		return 50;
+	}
+	return 0;
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 4b - Effect of numeric literal vs numberic expression]
+	let x = true;
+	if (x) {
+		return 25 * 2;
+	}
+	return 0;
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 5a - Similar functions with literal and identifier name changes]
+	let url = "https://api1.com/apiKey=" + state.API_KEY + "&data=search-data";
+	return http.get(url);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 5b - Similar functions with literal and identifier name changes]
+	let BASE_URL = "api2.co.uk/key=" + env.API_KEY + "&search=data";
+	return superagent.get(url);
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 6a - Real integration connect bodies]
+    const { username, password } = await requestLogin();
+    const { customerId } = await getUser(username, password);
+    const associatedMeteringPoints = await getMeteringPointAssociated(
+        username,
+        password,
+        customerId
+    );
+    if (!associatedMeteringPoints.length) {
+        throw new Error("No associated metering point found");
+    }
+    const meteringPointId = associatedMeteringPoints[0].mpid;
+    const priceRegion = await getRegion(meteringPointId);
+    // Set state to be persisted
+    return {
+        username,
+        password,
+        meteringPointId,
+        priceRegion
+    };
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 6b - Real integration connect bodies]
+ const { username, password } = await requestLogin();
+ await logIn(username, password);
+ return {
+   username,
+   password,
+ };
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 7a - Real integration against order scrambled integration]
+	const { username, password } = await requestLogin();
+	// Try to login
+	const { customerId } = await getUser(username, password);
+	const associatedMeteringPoints = await getMeteringPointAssociated(
+		username,
+		password,
+		customerId
+	);
+	if (!associatedMeteringPoints.length) {
+		throw new Error("No associated metering point found");
+	}
+	const meteringPointId = associatedMeteringPoints[0].mpid;
+	const priceRegion = await getRegion(meteringPointId);
+	// Set state to be persisted
+	return {
+		username,
+		password,
+		meteringPointId,
+		priceRegion
+	};
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 7b - Real integration against order scrambled integration]
+	if (!associatedMeteringPoints.length) {
+		throw new Error("No associated metering point found");
+	}
+	const meteringPointId = associatedMeteringPoints[0].mpid;
+	const associatedMeteringPoints = await getMeteringPointAssociated(
+		username,
+		password,
+		customerId
+	);
+	const priceRegion = await getRegion(meteringPointId);
+	const { customerId } = await getUser(username, password);
+	const { username, password } = await requestLogin();
+	return {
+		username,
+		password,
+		meteringPointId,
+		priceRegion
+	};
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 8a - Functing call vs inlining]
+function a() {
+	let value = 50;
+	return b(value);
+}
+
+function b(value) {
+	if (x > y) {
+		return value * 2;
+	} else {
+		return 0;
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 8b]
+function c() {
+	let value = 50;
+	if (x > y) {
+		return value * 2;
+	} else {
+		return 0;
+	}
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 9a - Inversion of control structure]
+	let value = 0;
+	for (let i = 0; i > 10; i++) {
+		if (i > 5) {
+			value++;
+		}
+	}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 9b - Inversion of control structure]
+	let value = 0;
+	if (i > 5) {
+		for (let i = 0; i > 10; i++) {
+			value++;
+		}
+	}
+\end{lstlisting}
+
+\textbf{Table 2} - $MPV$ Refers to Maximum Punishment Value, the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
+
+\begin{center}
+ \begin{tabular}{||c c c c c c c c c c||} 
+ \hline
+ MPV  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ [0.5ex] 
+ \hline\hline
+ 10 & 0 & 0.17 & 0 & 0.08 & 0 & 3.47 & 0 & 0 & 0.09 \\ 
+ \hline
+ 20 & 0 & 0.31 & 0 & 0.15 & 0 & 3.54 & 0 & 0 & 0.18 \\ 
+ \hline
+ 30 & 0 & 0.31 & 0 & 0.22 & 0 & 3.6 & 0 & 0 & 0.28 \\ 
+ \hline
+  40 & 0 & 0.31 & 0 & 0.3 & 0 & 3.6 & 0 & 0 & 0.36 \\ 
+  \hline
+    50 & 0 & 0.31 & 0 & 0.38 & 0 & 3.6 & 0 & 0 & 0.46 \\ 
+  \hline
+   75 & 0 & 0.31 & 0 & 0.57 & 0 & 3.6 & 0 & 0 & 0.68 \\ 
+  \hline
+  150 & 0 & 0.31 & 0 & 1.15 & 0 & 3.6 & 0 & 0 & 1.38 \\ 
+  \hline
+  $\infty$ & 0 & 0.31 & 0 & 1.8 & 0 & 3.6 & 0 & 0 & 2.17 \\ 
+  \hline
+  
+\end{tabular}
+\end{center}
+
+The $MPV$ results are as expected, as the value rises so do the values of certain tests such as comparison 6, however it eventually reaches its true value at 3.6 within minor adjustments the same can be said for comparison 2. However, for some tests MPV was concealing a much higher difference value generated by the system, in both tests 4 \& 9 we see an S of >0.1 considered to be very similar as perhaps they should be, but MPV was concealing the fact that before this stage the system judges the items to be  very dissimiliar. Although MPV is certainly useful in certain circumstances it was removed due to the fact it could be used as a crutch to conceal issues with JeSSE.
+
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1}
+
+\begin{center}
+ \begin{tabular}{||c c c c c c c c c c||} 
+ \hline
+ Diff Values & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ [-0.2ex] 
+ \hline\hline
+ D=10,N=10,E=2.5,A=5  & 0 & 0.171 & 0 & 0.08 & 0 & 3.47 & 0 & 0 & 0.09 \\ 
+ \hline
+ D=10,N=10,E=5,A=2.5  & 0 & 0.63 & 0 & 1.94 & 0 & 3.65 & 0 & 0 & 2.3  \\
+ \hline
+ D=5,N=5,E=2.5,A=1 & 0 & 0.31 & 0 & 0.97 & 0 & 3.5 & 0 & 0 & 1.17  \\
+ \hline
+  D=2,N=2,E=1,A=0.1  & 0 & 0.013 & 0 & 0.39 & 0 & 3.4 & 0 & 0 & 0.47  \\
+  \hline
+    D=3,N=3,E=1,A=0.5 & 0 & 0.05 & 0 & 0.56 & 0 & 3.45 & 0 & 0 & 0.67  \\
+  \hline
+   D=3,N=3,E=0.5,A=0.1  & 0 & 0.063 & 0 & 0.53 & 0 & 3.41 & 0 & 0 & 0.63 \\ 
+  \hline
+\end{tabular}
+\end{center}
+
+ These tests were replaced with integration tests that were judged to perform poorly with the new tuning, however, MOSS performed very poorly here as the integrations are not in anyway plagiarised. So MOSS was dropped as a comparison, due to the problem of similarity a set of heuristics were formed. The first 4 tests must be greater than 1 but ideally as low as possible, the final 3 tests should be as close to 0 as possible.
 
 
 \bibliography{sample}
