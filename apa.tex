@@ -71,16 +71,16 @@ An integration is a suite of functions that connect to and retrieve data from a 
 Currently, in order for volunteer engineers to test their integrations, they must run a server locally which provides limited feedback and capabilities. This project’s aim is to reduce the initial discomfort, confusion and workload often present when beginning development on a system. The desired effect of this is to increase both the number of volunteer engineers and the volunteer engineer retention rate.
 
 \subsection{Proposed Solution}
-This project focuses on a technical route of achieving this outcome, attempting to automate the "toil" (Beyer et al, 2016) of integration development.  Transpiling, hot loading, executing, rendering results, handling environment variables et cetera. The idea is to eliminate the rigmarole often involved in project configuration, providing a pre-configured IDE with live servers ready to execute volunteer engineer code. 
+This project focuses on a technical route of achieving this outcome, attempting to automate the "toil" \cite{beyer_jones_petoff_murphy} of integration development.  Transpiling, hot loading, executing, rendering results, handling environment variables et cetera. The idea is to eliminate the rigmarole often involved in project configuration, providing a pre-configured IDE with live servers ready to execute volunteer engineer code. 
 
-Additionally, there are a finite number of discrete ways to develop the interface functions (connect, collect and disconnect). Meaning there will likely be a great deal of similarity between integrations. Necessarily the greater the integration count the greater the chance two of which are similar, and with Tomorrow anticipating over 100 integrations in an optimistic scenario we would expect a number of them to be very similar in places. Because of this, a code similarity engine is planned to allow Tomorrow and volunteer engineers to identify and learn from similar integrations. The volunteer engineers could use this to learn and fix their integrations, whereas the Tomorrow engineers may be able to, over time, refine their interface functions or add templates to further trivialise integration development.
+Additionally, there are a finite number of discrete ways to develop the interface functions (connect, collect and disconnect). Meaning there will likely be a great deal of similarity between integrations. Necessarily the greater the integration count the greater the chance two of which are similar, and with Tomorrow anticipating over 100 integrations in an optimistic scenario it would be expected that a number of them to be very similar in places. Because of this, a code similarity engine is planned to allow Tomorrow and volunteer engineers to identify and learn from similar integrations. The volunteer engineers could use this to learn and fix their integrations, whereas the Tomorrow engineers may be able to, over time, refine their interface functions or add templates to further trivialise integration development.
 
 \subsection{Relevance}
 As much of modern software has moved from the desktop to the web, some are left questioning why the desktop IDE is still so widely used by developers, a group who by all means should be ahead of the curve. There are, of course, concerns that web applications cannot hope to provide the computational power necessary but attaching a cloud server could overcome this problem. It hoped throughout the development of this project provides a greater understanding of the limitations and boons of web-based IDE systems. 
 
 Finally, although there is a much literature on code plagiarism detection and the modern IDE often provides information about when the code is duplicated. There seems to be a lack of focus on identifying similar but not equivalent code. It is often joked about that the contemporary software developer should concern themselves more with the literacy of sites like StackOverflow than they should with code. The reason this statement holds so much truth is software developers infrequently solve a unique problem. Although specific domain details make one problem superficially different, these are often easily identified by developers. It is hoped that this similarity identifying technology touches on an area largely unexploited, identifying similar code. In the future, this could be the basis of a JavaScript template engine facilitating the expedition of feature development. Many large technology companies use such technology internally but as of yet, there is surprisingly not widespread use of these techniques in other spheres.
 
-In this scenario instead of thousands of developers coding solutions to many different problems, we instead see a small number of volunteer engineers all solving essentially the same problems with different solutions. Due to the hyper-specificity provided by the tomorrow integration development microcosm, there is a significant problem relaxation, it is hoped enough so that a similarity identification tool will prove useful.
+In this scenario instead of thousands of developers coding solutions to many different problems, instead there are a small number of volunteer engineers all solving essentially the same problems with different solutions. Due to the hyper-specificity provided by the tomorrow integration development microcosm, there is a significant problem relaxation, it is hoped enough so that a similarity identification tool will prove useful.
 
 \subsection{Objectives}
 The project focuses on two discrete areas, 
@@ -92,7 +92,7 @@ The other domain is developing a performant code similarity tool. The JavaScript
 \subsection{Code Similarity}
 There is a wealth of literature in code similarity with much of it focussing on detecting plagiarism, although the intent behind detecting code similarities may be vastly different from TIDE pragmatically there is little difference in technique. Often plagiarism detection is concerned with being fooled or deceived, JeSSE does not share this concern as integrations are not assessed,  hence worries of deliberate obfuscation are misplaced. Furthermore, the comparison scope is large for many of these tools often spanning university-wide and/or including previous years, whereas JeSSE will be used in a much more confined space. Regardless code plagiarism literature is regarded as extremely relevant.
 
-Duri\`c \& Gašević (2013) enumerate several of the potential false flags involving lexical and structural code similarity, the relevant items for each are enumerated below.
+\cite{Duric2013} enumerate several of the potential false flags involving lexical and structural code similarity, the relevant items for each are enumerated below.
 
 Lexical
 \begin{itemize}
@@ -112,33 +112,33 @@ Structural
   \item Method inlining and method refactoring
 \end{itemize}
 
-Duri\`c \& Gašević follow a token-based analysis and use RKR-GST - Efficient randomized pattern-matching algorithms (Karp \& Rabin, 1987). This searches for longest contiguous match greater than a minimum value and then marks it as to avoid duplication. Additionally, they make use of The Winnowing algorithm. 
+\cite{Duric2013} follow a token-based analysis and use RKR-GST - Efficient randomized pattern-matching algorithms \cite{Rabin1987}. This searches for longest contiguous match greater than a minimum value and then marks it as to avoid duplication. Additionally, they make use of The Winnowing algorithm. 
 This algorithm strips white spaces and forms n-grams from their hashes, these are then checked for a certain amount of overlap, for each value the hash with the lowest overlap is selected as representative. This reduces the number of hash values facilitating for greater efficiency in substring detection. They combine the results of these algorithms to retrieve a final similarity value.
 
-Lancaster \& Culwin (2004) complete a review of many source code plagiarism tools, they delineate plagiarism tools into two categories. Structure metric systems where every submission is extracted down to a vector of representative numbers and attribute counting systems, where certain attributes (such as identical values) are counted. Verco \& Wise (1996) found attribute counting systems to have greater accuracy when the programs were very similar however they were unable to detect partial plagiarism and overall the performance metrics for structural metric systems were much greater. 
+\cite{Lancaster2005} complete a review of many source code plagiarism tools, they delineate plagiarism tools into two categories. Structure metric systems where every submission is extracted down to a vector of representative numbers and attribute counting systems, where certain attributes (such as identical values) are counted. \cite{Verco1996} found attribute counting systems to have greater accuracy when the programs were very similar however they were unable to detect partial plagiarism and overall the performance metrics for structural metric systems were much greater. 
 
-Although it appears that many plagiarism identifiers are based on Token comparison there is an alternate approach in newer literature which involves a strategy of AST comparison. Feng et al (2013) suggest that token-based comparison is unable to effectively detect if the order of tokens has been rearranged, this problem does not occur in AST based comparison. Feng et al use an algorithm called AST-CC to hash nodes and compare the hash of each node with each other node with the same number of child nodes.Zhao et al 2015 also opt to use an AST-based approach, in order to compare these nodes, they first transform the AST into a group into a linear list and then into a group of subtrees based on the number of child nodes. Once this is complete they also use the AST-CC algorithm over it for comparison. Their AST-CC hash function includes only the type and children of each node omitting other comparison considerations but certainly a more efficient solution for scale.
+Although it appears that many plagiarism identifiers are based on Token comparison there is an alternate approach in newer literature which involves a strategy of AST comparison. \cite{Feng2013} suggest that token-based comparison is unable to effectively detect if the order of tokens has been rearranged, this problem does not occur in AST based comparison. Feng et al use an algorithm called AST-CC to hash nodes and compare the hash of each node with each other node with the same number of child nodes. \cite{Zhao2015} also opt to use an AST-based approach, in order to compare these nodes, they first transform the AST into a group into a linear list and then into a group of subtrees based on the number of child nodes. Once this is complete they also use the AST-CC algorithm over it for comparison. Their AST-CC hash function includes only the type and children of each node omitting other comparison considerations but certainly a more efficient solution for scale.
 
 It has been found so far that comparison techniques unanimously use hashing for the comparison of nodes, however, it is believed, that this hashing although providing greater for comparison efficiency, ultimately obfuscates the weighting of "difference types". Should the same type of element edited greatly provide a greater similarity than if it was removed entirely? This consideration and many others can be accounted for by using seperate penalisation values for each difference type, rather than tweaking a hashing algorithm. Tuning the algorithms weights to provide more accurate similarity appears to be a powerful tool that needs to be considered. It should also be noted all of these previous tools were developed as plagiarism tools, as mentioned encountering slightly different problems. 
 \subsection{Similarity Evaluation}
 
-In order to compare the effectiveness of plagiarism detection systems many researchers employ other well-established systems, Duri\textbackslash{}`\'{c} \textbackslash{}\& Ga\v{s}evi\'{c} use Measure Of Software Similarity (MOSS) (Aiken, 2018). Research from Engels et al (2007) found MOSS to be the most effective plagiarism system when utilised neural networks to assess the performance of 12 different engines, MOSS also invented the aforementioned Winnowing algorithm (Aiken et al, 2003) which is employed in MOSS. However, in order for MOSS\textquotesingle s values to have any meaning, the project must first be analysed to determine if it\textquotesingle s inner workings apply to this scenario.
+In order to compare the effectiveness of plagiarism detection systems many researchers employ other well-established systems, Duri\textbackslash{}`\'{c} \textbackslash{}\& Ga\v{s}evi\'{c} use Measure Of Software Similarity (MOSS) \cite{aiken_1994}. Research from \cite{Engels2007} found MOSS to be the most effective plagiarism system when utilised neural networks to assess the performance of 12 different engines, MOSS also invented the aforementioned Winnowing algorithm \cite{Schleimer2003} which is employed in MOSS. However, in order for MOSS\textquotesingle s values to have any meaning, the project must first be analysed to determine if it\textquotesingle s inner workings apply to this scenario.
 
 MOSS is white space insensitive, suppresses noise by ignoring trivially short k-grams and position-independent. MOSS does not opt to remove identifiers but instead replaces all identifiers with the character \textquotedblleft{}V\textquotedblright{}, but MOSS is sensitive to comments. Additionally MOSS uses asymmetric comparison, i.e. compare(a,b) does not necessarily have to yield the same result as compare(b,a). 
 
 \subsubsection{The Issue of Similarity}
-Code similarity is not objective, although it may be asserted that two pieces of identical code are very similar, how many changes can one make before this similarity is lost? Plagiarism scarcely addresses this issue and instead defers to alternate plagiarism systems to provide answers, however, if other plagiarism systems are somewhat unsuccessful using as  a baseline is counterproductive. Krinke (2002) discusses a solution to this issue, in order to tune his code similarity engine he used a list of code excerpts with code duplication and then manually checked whether they were duplicates. Although this is somewhat hazier in the example of similarity manual checking must be used.
+Code similarity is not objective, although it may be asserted that two pieces of identical code are very similar, how many changes can one make before this similarity is lost? Plagiarism scarcely addresses this issue and instead defers to alternate plagiarism systems to provide answers, however, if other plagiarism systems are somewhat unsuccessful using as  a baseline is counterproductive. \cite{Krinke2002} discusses a solution to this issue, in order to tune his code similarity engine he used a list of code excerpts with code duplication and then manually checked whether they were duplicates. Although this is somewhat hazier in the example of similarity manual checking must be used.
 
 \subsection{Web IDEs}
 The idea of an online IDE is far from a new one, many companies already offer this service: codesandbox.io, codepen and JSFiddle to name a few. However, typically these environments are for prototyping and experimenting rather than developing complete projects. Much of the literature involving remote code execution has a heavy focus on how secure systems are, this is not so much a concern with TIDE as there no sensitive data accessible or even associated with the system. However, previous solutions will be analysed to derive a set of best practices and technology considerations.
 
-Timo et al (2011) preach the benefits of an online IDE, namely the developer need not worry about configuring or updating the environment. They continue to suggest the use of a development server in which the code can be stored and ran on. In this case, they opt to use a Java Servlet to fulfil this role.
+\cite{Aho2011} preach the benefits of an online IDE, namely the developer need not worry about configuring or updating the environment. They continue to suggest the use of a development server in which the code can be stored and ran on. In this case, they opt to use a Java Servlet to fulfil this role.
 
-A solution that aims to provide a comprehensive IDE experience in the browser is codeanywhere (2019), the system works by providing each user with their own containerised virtual machine with dedicated memory and storage. This VM can be fully customised and set up with many development stacks and offering over 120 languages. As impressive as this solution may be spinning up a virtual machine for each volunteer developer this appears to be excessive for TIDE's scenario. 
+A solution that aims to provide a comprehensive IDE experience in the browser is \cite{codeanywhere}, the system works by providing each user with their own containerised virtual machine with dedicated memory and storage. This VM can be fully customised and set up with many development stacks and offering over 120 languages. As impressive as this solution may be spinning up a virtual machine for each volunteer developer this appears to be excessive for TIDE's scenario. 
 
-Malan (2013) documents his approach to developing a web IDE for students attending programming modules at Harvard University, known as CS50. CS50 is a much less distant scenario than a fully-fledged IDE  replacement and has many features akin to the requirements of TIDE. However, it does aim to provide many languages rather than just JavaScript. CS50 is built with NodeJS as its event-driven architecture is well-suited to handle asynchronous demands. Many developers may be concerned that a web IDE would incur non-trivial latency issues, enough so to make it worth using an offline alternative. Malan addressed this concern with the use of WebSockets for continuous interaction between server and client.
+\cite{Malan2013} documents his approach to developing a web IDE for students attending programming modules at Harvard University, known as CS50. CS50 is a much less distant scenario than a fully-fledged IDE  replacement and has many features akin to the requirements of TIDE. However, it does aim to provide many languages rather than just JavaScript. CS50 is built with NodeJS as its event-driven architecture is well-suited to handle asynchronous demands. Many developers may be concerned that a web IDE would incur non-trivial latency issues, enough so to make it worth using an offline alternative. Malan addressed this concern with the use of WebSockets for continuous interaction between server and client.
 
-Goldman et al (2011) developed a collaborative web IDE, they opted to import their text-based portion of the IDE in its entirety rather than engineering their own, this is very much applicable to TIDE. Building a web input for code complete with autocomplete and syntax highlighting would take up a great deal of development time and hence one of the alternatives they offer may be used. 
+\cite{Goldman2011} developed a collaborative web IDE, they opted to import their text-based portion of the IDE in its entirety rather than engineering their own, this is very much applicable to TIDE. Building a web input for code complete with autocomplete and syntax highlighting would take up a great deal of development time and hence one of the alternatives they offer may be used. 
 
 \section{System Decisions}
 \subsection{Frontend Technology}
@@ -210,7 +210,7 @@ Deep nodes almost unanimously require leaf node extraction. The algorithm traver
 
 Other statements, such as lambda expressions, may also be deep nodes but they have a different structure. These nodes must pass a gauntlet of cascading conditions as there is so much diversity in the node structure there is no one simple condition to determine whether children are present. For example, if a node has a consequent, there is no certainty that consequent has a body and even if a consequent's body is present it may be empty. When a node succeeds in passing these conditions their children are extracted in the same fashion as deep nodes, but simply referring to a different route to the body. 
 
-In Listing 1 \& 2 exactly the same instructions are called in a semantically equivalent manner but they would yield vastly different similarity results if we were to ignore function inlining. 
+In Listing 1 \& 2 exactly the same instructions are called in a semantically equivalent manner but they would yield vastly different similarity results if function inlining was to be ignored. 
 
 \begin{lstlisting}[caption=Function returning call expression]
 function connect() {
@@ -343,7 +343,7 @@ Each method of each integration undergoes the comparison process with the volunt
 
 \section{TIDE Implementation}
 \subsection{Code Execution}
-There are many ways to dynamically execute code in JavaScript, one of which is the notorious \texttt{eval()}, many of the reasons eval is widely disliked is due to its security implications, not particularly concerning to TIDE. However,  it also runs into many efficiency concerns. Meawad et al (2012) posited that \texttt{eval()} is, in almost every scenario, replaceable by a superior alternative, even developing a tool that automatically replaced 97\% of eval usage. There are many alternatives to \texttt{eval}, some are assessed below.
+There are many ways to dynamically execute code in JavaScript, one of which is the notorious \texttt{eval()}, many of the reasons eval is widely disliked is due to its security implications, not particularly concerning to TIDE. However,  it also runs into many efficiency concerns. \cite{Meawad2012} posited that \texttt{eval()} is, in almost every scenario, replaceable by a superior alternative, even developing a tool that automatically replaced 97\% of eval usage. There are many alternatives to \texttt{eval}, some are assessed below.
 
 \begin{itemize}
   		\setlength\itemsep{-0.2em}
@@ -354,7 +354,7 @@ There are many ways to dynamically execute code in JavaScript, one of which is t
 		
 	\end{itemize}
 	
-			Once the module importing option was decided upon a new problem arose in order to allow execution of all valid JavaScript, the system must support also support ES2015+ syntax. However, node.js does not yet have full native support for all these features (node.js, 2019). Silva et al (2017)  discuss one solution to this is transpiling the code, from ES2015+ to ES2015 as ES2015+ does not add any feature to the language which cannot be replicated in more verbose ES2015, which is fully supported by node.js. However, transpiling comes at a cost, all code must be transformed before execution this is in most cases a trivial issue as all code is transpiled at the beginning. In this circumstance as ES6 features are supported in the IDE every single code execution must be transpiled to ES2015 to run, a non-trivial performance cost. Another and perhaps better solution to this is via the use of ESM, a module loader that transforms ECMAScript2015+ modules at run time rather than transpiling them (Benny, 2018). This can be added to the entire system via simply running the server's root JavaScript file through the ESM module loader rather than directly. The elegance of this solution comes from the issue that the server itself uses ES16+ syntax,  the ESM module loader combats both this and the issue of ES16+ in integrations simultaneously.
+			Once the module importing option was decided upon a new problem arose in order to allow execution of all valid JavaScript, the system must support also support ES2015+ syntax. However, node.js does not yet have full native support for all these features \cite{node.js_2019}. \cite{Silva2017}  discuss one solution to this is transpiling the code, from ES2015+ to ES2015 as ES2015+ does not add any feature to the language which cannot be replicated in more verbose ES2015, which is fully supported by node.js. However, transpiling comes at a cost, all code must be transformed before execution this is in most cases a trivial issue as all code is transpiled at the beginning. In this circumstance as ES6 features are supported in the IDE every single code execution must be transpiled to ES2015 to run, a non-trivial performance cost. Another and perhaps better solution to this is via the use of ESM, a module loader that transforms ECMAScript2015+ modules at run time rather than transpiling them \cite{powers_2018}. This can be added to the entire system via simply running the server's root JavaScript file through the ESM module loader rather than directly. The elegance of this solution comes from the issue that the server itself uses ES16+ syntax,  the ESM module loader combats both this and the issue of ES16+ in integrations simultaneously.
 			
 				\begin{figure}[h]
 \caption{The Code Execution flow}
@@ -428,8 +428,6 @@ function sleepTest() {
 \end{lstlisting}
 
 If no maximum punishment value is set here, due to the manner that JeSSE recursively evaluates nodes even inside of call expressions this produces an $TS$ of 30, which has been regarded as disproportionately low for such a change. A naive solution to this is to say why not treat all numeric operations and such as one numeric literal, the calculation in listing 4 is trivial and present for clarity sake but in real integrations, it is unlikely all calculations will be deterministic.
-
-The initial tuning attempt involved the code comparisons used to assess the effectiveness of JeSSE vs MOSS (Listings x to y) known as Test Suite 1, however, once these were optimised (see table 2,3 \& 4) real comparison of integrations were judged to perform poorly.
 
 \subsubsection{Combinatorial Tuning}
 Although there is little doubt an approach of assessing combinatorial parameters thoroughly  would lead to the system functioning more effectively, due to the oracle problem brought about as a result of the problem of similarity an enormous amount of manual work. This will be discussed further later on.
@@ -598,8 +596,11 @@ function c() {
 		}
 	}
 \end{lstlisting}
+\subsubsection{Maximum Punishment Value - Test Suite 1}
 
 \textbf{Table 2} - $MPV$ Refers to Maximum Punishment Value, the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
+
+\renewcommand{\arraystretch}{1.5}
 
 \begin{center}
  \begin{tabular}{||c c c c c c c c c c||} 
@@ -626,10 +627,17 @@ function c() {
 \end{tabular}
 \end{center}
 
-The $MPV$ results are as expected, as the value rises so do the values of certain tests such as comparison 6, however it eventually reaches its true value at 3.6 within minor adjustments the same can be said for comparison 2. However, for some tests MPV was concealing a much higher difference value generated by the system, in both tests 4 \& 9 we see an S of >0.1 considered to be very similar as perhaps they should be, but MPV was concealing the fact that before this stage the system judges the items to be  very dissimiliar. Although MPV is certainly useful in certain circumstances it was removed due to the fact it could be used as a crutch to conceal issues with JeSSE.
+The $MPV$ results are as expected, as the value rises so do the values of certain tests such as comparison 6, however it eventually reaches its true value at 3.6 within minor adjustments the same can be said for comparison 2. However, for some tests MPV was concealing a much higher difference value generated by the system, in both tests 4 \& 9 a S of >0.1  is observed, this is considered to be very similar, but MPV was concealing the fact that before this stage the system judges the items to be  very dissimiliar. Although MPV is certainly useful in certain circumstances it was removed due to the fact it could be used as a crutch to conceal issues with JeSSE. 
+
+Diff values encounter the same issue as the aformentioned issue of combinatorial testing, in order to drastically reduce the number of permutations a number of assumptions were made. (1) New and Deletion are considered equivalent, this is due to the \textit{eventually bilateral} nature of the system. (2) The diff values were judged to have these relative weights New \& Deletion > Edit > Array Change || New \& Deletion > Array Change > Edit.
+
+\subsubsection{Diff Values - Test Suite 1}
+
+\textbf{Table 3} - Each letter in the diff value represents the difference type (D)eletion, (N)new, (E)dit, (A)rray Change. the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
+
 
 \setlength{\tabcolsep}{2pt}
-\renewcommand{\arraystretch}{1}
+\renewcommand{\arraystretch}{1.5}
 
 \begin{center}
  \begin{tabular}{||c c c c c c c c c c||} 
@@ -651,9 +659,490 @@ The $MPV$ results are as expected, as the value rises so do the values of certai
 \end{tabular}
 \end{center}
 
- These tests were replaced with integration tests that were judged to perform poorly with the new tuning, however, MOSS performed very poorly here as the integrations are not in anyway plagiarised. So MOSS was dropped as a comparison, due to the problem of similarity a set of heuristics were formed. The first 4 tests must be greater than 1 but ideally as low as possible, the final 3 tests should be as close to 0 as possible.
+The diff values have a much greater effect on $S$ as might be anticipated as whereas $MPV$ influences the maximum value, the diff values are the fundamental constituent of S. It is fair to say diff value tuning could be much more thorough, however, the limitations of this have already been discussed.
 
+This initial tuning attempt involved the code comparisons created to assess the effectiveness of JeSSE vs MOSS (Listings 6 to 21) known as Test Suite 1, however, once these were optimised (see table 2 \& 3 ) real comparison of integrations were judged to perform poorly. Before missing modifier tuning took place it was decided that Test Suite 1 should only be used for the purpose it was created for, that is comparing JeSSE to MOSS. Test Suite 2 was created using real integration comparison (albeit altered), it additionally came with a heuristic to improve the ability to optimise: The first 4 tests (10-13) must be greater than 1 but ideally as low as possible, the final 3 tests (14-16) should be as close to 0 as possible.
 
-\bibliography{sample}
+\subsection{Test Suite 2}
+
+\begin{lstlisting}[caption=Comparison 10a - A comparison of the template connect against barry.js's connect]
+const { username, password } = await requestLogin();
+	logger.log("info", "hello world");
+	logger.log("debug", { username, password });
+	return {
+		username,
+		password
+	};
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 10b - A comparison of the template connect against barry.js's connect]
+const { username, password, meteringPointId, priceRegion } = state;
+	const startDate =
+		state.lastFullyCollectedDay ||
+		moment()
+			.subtract(1, "month")
+			.toISOString();
+	const endDate = moment().toISOString();
+	const response = await getHourlyConsumption(
+		username,
+		password,
+		meteringPointId,
+		startDate,
+		endDate
+	);
+	const { locationLon, locationLat } = REGION_TO_LOCATION[priceRegion];
+	const activities = Object.entries(
+		groupBy(response, d =>
+			moment(d.date)
+				.startOf("day")
+				.toISOString()
+		)
+	).map(([k, values]) => ({
+		id: `barry${k}`,
+		datetime: moment(k).toDate(),
+		activityType: ACTIVITY_TYPE_ELECTRICITY,
+		energyWattHours: values
+			.map(x => x.value * 1000.0) // kWh -> Wh
+			.reduce((a, b) => a + b, 0),
+		durationHours: values.length,
+		hourlyEnergyWattHours: values.map(x => x.value * 1000.0),
+		locationLon,
+		locationLat
+	}));
+	activities
+		.filter(d => d.durationHours !== 24)
+		.forEach(d =>
+			logWarning(
+				`Ignoring activity from ${d.datetime.toISOString()} with ${
+					d.durationHours
+				} hours instead of 24`
+			)
+		);
+	if (!activities.length) {
+		return { activities: [] };
+	}
+	const lastFullyCollectedDay = moment(
+		activities[activities.length - 1].datetime
+	)
+		.subtract(1, "day")
+		.toISOString();
+	return {
+		activities: activities.filter(d => d.durationHours === 24),
+		state: { ...state, lastFullyCollectedDay }
+	};
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 11a - Template connect against rejsekort.js's logIn Method]
+	const { username, password } = await requestLogin();
+	logger.log("info", "hello world");
+	logger.log("debug", { username, password });
+	return {
+		username,
+		password
+	};
+
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 11b - Template connect against rejsekort.js's logIn Method]
+	return logIn(username, password, logger);
+
+// Login
+async function logIn(username, password, logger) {
+	const requestToken = await getLoginRequestToken(logger);
+	const res = await agent
+		.post(LOGIN_FORM_URL)
+		.type("form").
+		.set("Accept-Language", "en;en-US")
+		.send({
+			Username: username,
+			Password: password,
+			__RequestVerificationToken: requestToken
+		});
+
+	if (res.text.match(/(Error|Fejl)/)) {
+		const parser = new DOMParser();
+		const document = parser.parseFromString(res.text, "text/html");
+		const container = document.getElementById(
+			"validation-summary-v5-container"
+		);
+		if (res.text.match(/Error404/)) {
+		} else if (!container) {
+			throw Error("Unknown error");
+		} else {
+			const errors = Array.from(container.getElementsByTagName("li")).map(
+				d => d.firstChild.textContent
+			);
+			throw Error(errors.join(", "));
+		}
+	} else if (!res.text.match(/(is logged in|er logget in)/)) {
+		// Log more info
+		logger.logDebug(
+			`Seems like logIn failed. Headers: ${JSON.stringify(res.header)}`
+		);
+		throw Error("This doesn't look like the logged-in home page");
+	}
+	logger.logDebug("Successfully logged in.");
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 12a \& 12b - Singular Call Expression against length connect method (barry.js connect)]
+return logIn(username, password, logger);
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 13a - Very different methods with identical node and key count]
+const username = fetchUsername();
+	if (username.startsWith("xyz")) {
+		return true;
+	}
+	while (username.length > 10) {
+		username.splice();
+	}
+	return username;
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 13b - Very different methods with identical node and key count]
+	runX();
+	runY();
+	runZ();
+	if (x > y) {
+		return one();
+	} else {
+		const obj = {
+			key: "value"
+		};
+	}
+	return false;
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 14a - barry.js connect vs barry.js connect with addition lines added]
+	const { username, password, meteringPointId, priceRegion } = state;
+	const startDate =
+		state.lastFullyCollectedDay ||
+		moment()
+			.subtract(1, "month")
+			.toISOString();
+	const endDate = moment().toISOString();
+	const response = await getHourlyConsumption(
+		username,
+		password,
+		meteringPointId,
+		startDate,
+		endDate
+	);
+	const { locationLon, locationLat } = REGION_TO_LOCATION[priceRegion];
+	const activities = Object.entries(
+		groupBy(response, d =>
+			moment(d.date)
+				.startOf("day")
+				.toISOString()
+		)
+	).map(([k, values]) => ({
+		id: `barry${k}`,
+		datetime: moment(k).toDate(),
+		activityType: ACTIVITY_TYPE_ELECTRICITY,
+		energyWattHours: values
+			.map(x => x.value * 1000.0) // kWh -> Wh
+			.reduce((a, b) => a + b, 0),
+		durationHours: values.length,
+		hourlyEnergyWattHours: values.map(x => x.value * 1000.0),
+		locationLon,
+		locationLat
+	}));
+	activities
+		.filter(d => d.durationHours !== 24)
+		.forEach(d =>
+			logWarning(
+				`Ignoring activity from ${d.datetime.toISOString()} with ${
+					d.durationHours
+				} hours instead of 24`
+			)
+		);
+	if (!activities.length) {
+		return { activities: [] };
+	}
+	const lastFullyCollectedDay = moment(
+		activities[activities.length - 1].datetime
+	)
+		.subtract(1, "day")
+		.toISOString();
+	return {
+		activities: activities.filter(d => d.durationHours === 24),
+		state: { ...state, lastFullyCollectedDay }
+	};
+}
+
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Comparison 14b - barry.js connect against barry.js connect with addition lines added. These lines are inserted on row 16]
+...
+	const { asd, asdf } = REGION_TO_LOCATION[priceRegion];
+	const { locatiosdfnLon, locatisdfonLat } = REGION_TO_LOCATION[priceRegion];
+	...
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 15a - barry.js connect against ]
+	const { username, password, meteringPointId, priceRegion } = state;
+	const startDate =
+		state.lastFullyCollectedDay ||
+		moment()
+			.subtract(1, "month")
+			.toISOString();
+	const endDate = moment().toISOString();
+	const response = await getHourlyConsumption(
+		username,
+		password,
+		meteringPointId,
+		startDate,
+		endDate
+	);
+	const { locationLon, locationLat } = REGION_TO_LOCATION[priceRegion];
+	const activities = Object.entries(
+		groupBy(response, d =>
+			moment(d.date)
+				.startOf("day")
+				.toISOString()
+		)
+	).map(([k, values]) => ({
+		id: `barry${k}`,
+		datetime: moment(k).toDate(),
+		activityType: ACTIVITY_TYPE_ELECTRICITY,
+		energyWattHours: values
+			.map(x => x.value * 1000.0) // kWh -> Wh
+			.reduce((a, b) => a + b, 0),
+		durationHours: values.length,
+		hourlyEnergyWattHours: values.map(x => x.value * 1000.0),
+		locationLon,
+		locationLat
+	}));
+	activities
+		.filter(d => d.durationHours !== 24)
+		.forEach(d =>
+			logWarning(
+				`Ignoring activity from ${d.datetime.toISOString()} with ${
+					d.durationHours
+				} hours instead of 24`
+			)
+		);
+	if (!activities.length) {
+		return { activities: [] };
+	}
+	const lastFullyCollectedDay = moment(
+		activities[activities.length - 1].datetime
+	)
+		.subtract(1, "day")
+		.toISOString();
+	return {
+		activities: activities.filter(d => d.durationHours === 24),
+		state: { ...state, lastFullyCollectedDay }
+	};
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 15b]
+	const { username, password, meteringPointId, priceRegion } = state;
+	const startDate =
+		state.lastFullyCollectedDay ||
+		moment()
+			.subtract(1, "month")
+			.toISOString();
+	const response = await getHourlyConsumption(username, password);
+	const activities = Object.entries(
+		groupBy(response, d =>
+			moment(d.date)
+				.startOf("day")
+				.toISOString()
+		)
+	).map(([k, values]) => ({
+		id: `barry${k}`,
+		datetime: moment(k).toDate(),
+		activityType: ACTIVITY_TYPE_ELECTRICITY,
+		energyWattHours: values
+			.map(x => x.value * 1000.0) // kWh -> Wh
+			.reduce((a, b) => a + b, 0),
+		durationHours: values.length,
+		hourlyEnergyWattHours: values.map(x => x.value * 1000.0),
+		locationLon,
+		locationLat
+	}));
+	activities
+		.filter(d => d.durationHours !== 24)
+		.forEach(d =>
+			logWarning(
+				`Ignoring activity from ${d.datetime.toISOString()} with ${
+					d.durationHours
+				} hours instead of 24`
+			)
+		);
+	const lastFullyCollectedDay = moment(
+		activities[activities.length - 1].datetime
+	)
+		.subtract(1, "day")
+		.toISOString();
+	return {
+		activities: activities.filter(d => d.durationHours === 24),
+		state: { ...state, lastFullyCollectedDay }
+	};
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 16a]
+values = values.map(v => {
+		return v % 2 === 0 ? v * 2 : v;
+	});
+	return values;
+\end{lstlisting}
+\begin{lstlisting}[caption=Comparison 16b]
+	for (v in values) {
+		if (values[v] % 2 === 0) values[v] = values[v] * 2;
+	}
+	return values;
+\end{lstlisting}
+
+\textbf{Table 4} - Size Modifier values. The cells are populated with the resulting $S$.
+
+\renewcommand{\arraystretch}{1.5}
+
+\begin{center}
+ \begin{tabular}{||c c c c c c c c ||} 
+ \hline
+ Modifier & 10 & 11 & 12 & 13 & 14 & 15 & 16 \\ [-0.2ex] 
+ \hline\hline
+ 5   & 2.3 & 17.84 & 11.9 & 5.32 & 0.21 & 1.62 & 1.57  \\ 
+ \hline
+ 1 & 2.3 & 3 & 3.34 & 5.32 & 0.01 & 0.24 & 1.57 \\ 
+  \hline
+  0.5 & 2.3 & 2.12 & 2.9 & 5.32 & <0.01 & 0.15 & 1.57  \\ 
+   \hline
+   0.1 & 2.3 & 1.62 & 2.6 & 5.32 & <0.01 & 0.08 & 1.57 \\ 
+    \hline
+     0.02 & 2.3 & 1.54 & 2.56 & 5.32 & <0.01 & 0.07 & 1.57\\  
+     \hline
+      \textasciicircum 1.1 & 2.04 & 2.69 & 2.9 & 4.05 & 0.01 & 0.06 & 1.22 \\ 
+      \hline
+\end{tabular}
+\end{center}
+
+Initially the system was tuned using a linear increment, i.e. every line missing produces the same increase in $S$ simply by multiplying the difference by the modifier. It was eventually concluded that a linear increase of punishment was not representative of code similarity. Despite the perceived improvements on the test suite of using a very low modifier, it was found to be logically unsound. Similar excerpts of code are unlikely to be exactly the same size, instead as this difference increases each additional line added decreases the likelihood of similarity, hence it was sensible to instead use an exponential function with the use of the exponent seen in the table.  Despite of the fact this produces arguably worse results using the heuristic on test suite 2 (performing worse in some comparisons and better in others) it is believe this will more accurately relay similarity.If a much greater set of test data was available perhaps purely empirically driven assessment would be more viable, however due to these limitations a more reasoned approach must be taken, despite what story the data may tell. 
+
+\subsubsection{Modifier Criticism}
+One may make the argument that the effectiveness of the system is determined more on how similar the length of the two code excerpts is rather than their content. Some experiments were ran which address these concerns. Figure 6 \& 7 demonstrate respectively correlation between node difference and $S$, the x axis are calculated as: \[\dfrac{Base Node Count }{Compare Node Count}\] \[\dfrac{Base Key Count }{Compare Key Count}\]
+
+				\begin{figure}[h]
+\caption{Node count similarity graph}
+\centering
+\includegraphics[width=0.55\textwidth]{nodecount}
+\end{figure}
+
+				\begin{figure}[h]
+\caption{Node count similarity graph}
+\centering
+\includegraphics[width=0.55\textwidth]{keycount}
+\end{figure}
+
+Although generally a greater similarity in length of both keys and nodes in more similar code comparison can be observed, this perhaps what we would expect. The strength of this correlation has not been judged to be worrying and it is by no means the primary weight in comparison, in fact test 13 was engineered to have both identical node count and identical key count, this actually has the highest rate of dissimilarity in both Figure 6 \& 7. Hopefully dismissing the aforementioned concerns.
+
+\subsection{Diff Values - Test Suite 2}
+\textbf{Table 3} - Each letter in the diff value represents the difference type (D)eletion, (N)new, (E)dit, (A)rray Change. the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
+
+\setlength{\tabcolsep}{1pt}
+\renewcommand{\arraystretch}{1.5}
+
+\begin{center}
+ \begin{tabular}{||c c c c c c c c ||} 
+ \hline
+ Diff Values & 10 & 11 & 12 & 13 & 14 & 15 & 16 \\ [-0.2ex] 
+ \hline\hline
+ D=10,N=10,A=5, E=2.5 & 2.3 & 1.54 & 2.56 & 5.32 & <0.01 & 0.07 & 1.57 \\ 
+ \hline
+ D=10,N=10,E=2.5,A=1  & 2.18 & 1.54 & 2.56 & 5.32 & <0.01 & 0.01 & 1.57  \\
+ \hline
+ D=5,N=5,E=1,A=1  & 1.95 & 1.35 & 2.39 & 5.02 & <0.01 & 0.01 & 1.52  \\
+ \hline
+  D=10,N=10,E=1,A=0.2  & 1.93 & 1.35 & 2.39 & 5.02 & <0.01 & <0.01 & 1.52  \\
+  \hline
+    D=3,N=3,E=1,A=0.5  & 1.58 & 1.1 & 1.93 & 4.01 & <0.01 & 0.01 & 1.22 \\
+  \hline
+\end{tabular}
+\end{center}
+
+Enough has been said about diff values, the results are arranged in the order of heuristic effectiveness and the final row was chosen. In the case of test 16 which should ideally yield as $S$ of 0 this will be discussed as a limitation.
+
+\section{Evaluation}
+\subsection{JeSSE MOSS Differences}
+To not unfairly malign either comparison system first their differences must be established so they can be accounted for in comparison.  MOSS does not identify plagiarism this is impossible, even a 100\% score on MOSS does not mean plagiarism has taken place, it is simply an indication. As MOSS was aimed to identify plagiarism even after students obfuscate code it functions differently than JeSSE which aims to identify similarities. Volunteer engineers, unlike assessed students,  have no incentive to hide if they have copied code.
+
+Another feature of plagiarism is that often code is directly copied meaning lines may be identical other than some trivial changes to attempt to disguise this, volunteer engineers are not anticipated to copy, therefore JeSSE has been engineered to be more liberal in its similarity identification than it’s plagiarism detecting counterparts. MOSS JavaScript JeSSE differences: 
+
+\begin{itemize}
+  \setlength\itemsep{-0.5em}
+  \item MOSS checks comments whereas JeSSE ignores them completely 
+  \item MOSS cannot find any similarity between let/const declarations
+  \item MOSS works on a percentage basis, with 100\% being the most similar. However this does not mean identical code will yield a 100\% rating. The longer the matching n-gram found the higher this value is.
+  \item JeSSE's Transformed Similarity $TS$ works on a basis where 100 is the most similar and has no lower boundary, anything below 0 is displayed as 0. Although it should be remembered this is not percentage based, simply for similarity in comparison and clarity to engineers. 
+\end{itemize}
+
+To homogenise the comparison somewhat, MOSS's unilateral similarity values have been averaged as occurs in JeSSE. Additionally JeSSE's $TS$ value will be used rather than $S$ this more closely resembles MOSS's similarity value. These comparisons are not to discredit one system and bolster the reputation of the other, they are simply to see how they compare in the circumstances relevant to JeSSE. As mentioned previously, test suite 1 (Listing 6 - 21) was designed for the comparison of JeSSE and MOSS.
+
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.5}
+
+\begin{center}
+ \begin{tabular}{||c c c c c c c c c c||} 
+ \hline
+  & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ [-0.2ex] 
+ \hline\hline
+ JeSSE & 100 & 67.5 & 100 & 72.3 & 100 & 0 & 100 & 67 & 100 \\ 
+ \hline
+ MOSS  & 75\% & 0\% & 91\% & 0\% & 94\% & 0\% & 0\%  & 0\% & 0\%\\
+ \hline
+\end{tabular}
+\end{center}
+
+In test 1 some idea of how the systems compare, MOSS yields a 75\% score and JeSSE a 100 score for identical code. If this code is expanded to its state in 3 we see that the MOSS value increases to 91\% whereas JeSSE remains at its maximum similarity value of 100. If now symmetry is broken  of the compare functions where the systems differ becomes evident, in test 4 semantically equivalent code is compared MOSS finds “no matches” which will be referred to as 0\% after this point, whereas JeSSE's AST based comparison although somewhat thrown off by a few additional nodes yields at 72.3 similarity. The "program smell" these code excerpts are extremely similar and JeSSE has successfully managed to identify this similarity more successfully than MOSS. 
+
+In test 5 a somewhat realistic hyper-simplified version of what may be seen in integration is present, both systems perform excellency in identifying the similarity here. All of the aforementioned comparisons have been working to identify short similar code, what if both systems are fed longer and much more dissimilar code? In test 6  code that shares minorly similarities but is generally very different is fed to the systems, both of these functions are taken from real integrations. Both systems identify this successfully with each provided its lowest score possible. 7 is an example with real applicability, the body of an integration (barry.js) is compared with itself but with its order scrambled. Even though the code in both functions is identical other than location, MOSS yields 0\% at all whereas JeSSE identifies a 100\% match. In test 6 the benefits of function inlining are visible, MOSS yields that there is no match between the two pieces of code, whereas JeSSE identifies that there is a strong similarity at 66. The 34 difference arises from the additional return statement (see Listing 35) along with the expression \texttt{b(value)}.
+
+\begin{lstlisting}[caption= Test 6 with function inlined]
+	let value = 50;
+return b(value);
+if (x > y) {
+    return value * 2;
+} else {
+    return 0;
+}
+
+\end{lstlisting}
+
+Test 8 demonstrates how the more liberal similarity comparison of JeSSE functions compared to MOSS. We see MOSS does not identify any similarities whereas JeSSE believes these are identical, this is seemingly a matter software similarity intent. 
+
+\subsection{Comparison Efficiency}
+
+Due to the nature of JeSSE not making use of hashing for comparison instead opting for the exclusive match algorithm which processes in quadratic time, concerns were raised about how the algorithm would scale in terms of runtime. Figure 8 is a graph documenting the homogenous growth of the size of each function. To balance the processing time between different types of code comparison was made using repeated lines listed below. As the hierarchy is built for every node in both trees order is irrelevant to processing time. Time is measured internally and measurements were taken 5 times for each and the mean was used.
+
+\begin{figure}[h]
+\caption{JeSSE Runtime with symmetrically increasing code size, i.e. code excerpt a and b are the length specified}
+\centering
+\includegraphics[width=0.5\textwidth]{jesseefficiency}
+\end{figure}
+
+Despite this rate of increase appearing minorly worrying it should be noted that these numbers are not for the entire module, but the body of each compare function. Currently, the longest integration (entire module) is under 300 lines, as there are 3 interface functions it is imagined be highly unlikely that the majority of these functions would reach even 200 lines. However what should be noted is that as these comparisons take place between each interface function of the new module and all other integrations, meaning 3 comparisons (albeit one trivial, \texttt{disconnect} is often essentially empty). If integration count was to reach over 100 this may start taking a toll. However, as code analysis is predicted to only be run on occasion this was considered completely reasonable.
+
+\subsection{Limitations}
+ In test 16 reveals a limitation of JeSSE, it cannot equate deprecated ECMAScript with new ECMAScript. As although these two code excerpts are identical in purpose they produce nodes with different keys, which is what the entirety of JeSSE functions off, although this provides great flexibility of the system in many circumstances it also limits it in this regard. Another example of where JeSSE performs poorly is in dissimilar code that performs a similar purpose, as JeSSE does not execute code this is a potential avenue for expansion.
+ 
+ Combinatorial tuning of hyperparameters is highly desirable, a convincing argument can be made that the current tuning strategy is flimsy and biased although the use of a heuristic has helped with this. Tuning one parameter at a time leads to the issue that the parameters are agnostic to the other parameters, even if missing modifier calculation values are removed entirely all this will achieve is optimising diff values under that circumstance, there is no guarantee that the tuning performed under this circumstance holds up very effectively. However, the heuristic provided has ultimately been significantly improved so it is regarded as having some improvement even if perhaps the hyperparameters are far from their optimal values.  Ultimately this down to the oracle problem brought about as a result of the problem of similarity.
+ 
+\section{Future Work}
+\subsection{TIDE}
+There are many areas for improvement, one of which is although the code is ran using the up to date resources, it is not at any point executed in their react native environment. Although no issues are foreseen here it is unlikely that no issues will arise from this in the long run. A solution to this would be to implement a new capability that extracts their code, injects it into the React Native codebase, builds and then runs the entire application on either a device the volunteer engineer has connected or an in-browser emulator. 
+
+Another issue is it anticipated many developers will favour their standard desktop IDEs as they are more accustomed to them and they provide more features even at the expense of domain-specific features. Ideally in the future for such developers who are not simply playing around with the idea of building an integration but developing a substantial module the development environment would be able to link up with the IDE. The idea of a web IDE has certainly not encountered into as many hurdles as anticipated, but as many engineers are accustomed to their IDE's it may more difficult to get engineers to migrate for non-domain-specific purposes. 
+
+A final feature idea that would remove the only remaining toil would be to automate a pull request with the open-source GitHub repository.
+
+\subsection{JeSSE}
+ JeSSE effectively identifies similar functions much like modern plagiarism tools, human input is still required to see if such similarities are sensible. The next steps for JeSSE could involve finding very similar subtrees seen in many integrations and then providing both volunteer and tomorrow engineers with the ability to view “suggested templates”. Volunteer engineers could verbatim insert these templates into their code and edit them however they see fit.  Tomorrow Engineers could then perhaps consider adding them to some form of “templates library” allowing future engineers to browse these before implementing anything themselves, essentially reducing the boilerplate code required for the volunteer engineers to write. 
+
+In the not so distant future perhaps many more engineers may see a template library built into their IDE hooked up to some monolithic database offering them suggestions on how other engineers have solved a similar problem. Either from their companies codebase or a global repository.
+
+Finally, an important question has been raised as of yet unaddressed, what is software similarity? Future research may work to formalise a definition of software similarity solving the problem of similarity, although this will certainly not be easy to accomplish. 
+
+\section{Conclusion}
+TIDE is believed to be a highly functional IDE offering a number of domain-specific capabilities that are hoped to encourage more volunteer engineers to get and remain involved with climate activism via the use of their technical skills. JeSSE has been shown to perform remarkably well when compared to its plagiarism detecting cousins, it is hoped that it will see widespread use within this small community of volunteer engineers. If so its usefulness will only grow as that community continues to expand. 
+
+\bibliography{references}
+
 
 \end{document}
