@@ -282,7 +282,7 @@ Function inlining is limited to member functions as to not exponentially expand 
 
 Each expression is analysed and if it is both (1) a call expression (2) and its method signature is present in the list of functions passed into the flattening method. The method name is then as a key to access the map of all member functions, it will then extract and flatten recursively the body of the called function. The result is the concatenation of the current list of nodes with the expression followed by the contents of the member function called. A function’s body can only be added to the list once per interface function, in the same manner, that the contents of a for loop are once rather than the number of times the loop iterates. 
 
-As the list is not a list of every node called, rather a unique list of each node that can be called, a function’s body can only be added to the list once per interface function. Consistent with the manner that the contents of a for loop is not added the number of times the loop iterates (if deterministic).
+As the list is not a list of every node called on a specific path, rather a unique list of each node that can be called on every path, a function’s body can only be added to the list once per interface function. For example, if \texttt{doX()} is called on the first and final line of the \texttt{connect} the contents of \texttt{doX()} its node will still only apper once, all looping control structures also behave in this manner.
 
 \subsubsection{Eliminate Irrelevant Nodes}
 The next phase of preprocessing is to eliminate the nodes that have been determined as irrelevant for comparison, which here only includes logging nodes. JeSSE has several specific logging method signatures hardcoded, the flattened node list is scanned and for call expressions matching these signatures dereferencing any matches.
@@ -322,7 +322,7 @@ Table 1
 \end{tabular}
 \newline\newline
 
-Having control of how the system treats each individual difference in terms of the capacity to alter the punishment value is extremely valuable, although node hashing offers greater efficiency it is found lacking in this domain (without the creation of a specific hashing algorithm). On comparison of each node, fields are compared and the corresponding punishment values are applied, the punishment values of each node are summed. Note that although the comparison is similar to each base node can match with a maximum of 1 compare node, but if there are fewer nodes on one side than the other unilateral similarity calculator may say the functions are very similar despite the fact one is much smaller than the other. For example in Listing 14 would correctly identify the most similar node, found in line 1 of Listing 15, calculate only this similarity value and output that the items are identical. This is an unacceptable outcome and the systems must be appropriately penalised for missing lines, which is not yet accounted.
+Having control of how the system weights each individual difference in its punishment value is extremely valuable, although node hashing offers greater efficiency it is found lacking in this domain (without the creation of a specific hashing algorithm). This list of differences is retrieved using a library known as \texttt{deep-diff}. On comparison of each node, fields are compared and the corresponding punishment values are applied, the punishment values of each node are summed. Note that although the comparison is similar to each base node can match with a maximum of 1 compare node, but if there are fewer nodes on one side than the other unilateral similarity calculator may say the functions are very similar despite the fact one is much smaller than the other. For example in Listing 14 would correctly identify the most similar node, found in line 1 of Listing 15, calculate only this similarity value and output that the items are identical. This is an unacceptable outcome and the systems must be appropriately penalised for missing lines, which is not yet accounted.
 
 \begin{lstlisting}[caption=Shares one node only - A]
 let start = new Date();
@@ -337,9 +337,9 @@ let start = new Date();
     return new Date().getTime() - start;
 \end{lstlisting}
 
-Finding each node’s best match is far less trivial than it seems. If this is done naively the match of one node will erroneously prevent all future nodes from matching with that node regardless of whether their similarity is greater than the original match, this only occurs due to the exclusivity of the problem. One solution to this would be to compare these values and if the new node shows greater similarity then return and repeat the process with the initial node. This results in unnecessary processing. The preferred solution that has been chosen is an algorithm developed named "exclusive match".
+Finding each node’s best match is far less trivial than it seems. The naive approach will case one match to erroneously prevent all future nodes from matching with said node, regardless of whether their similarity is greater than the original match, this only occurs due to the exclusivity of the problem. One solution to this would be to compare these values and if the new node shows greater similarity then return and repeat the process with the initial node. This results in unnecessary processing. The preferred solution that has been chosen is an algorithm developed named "exclusive match".
 
-Exclusive match builds a hierarchy of matches ordered by similarity as the nodes are compared. Each difference type is assigned its corresponding value and these are summed to form the similarity value, due to the nature of the parser two ASTs can contain vastly different keys despite not being extremely different in nature on occasion, so an upper boundary has been set as a maximum difference punishment value. Once all hierarchies have been built, the uniqueness of the first item in each hierarchy is then tested for duplicates. If a duplicate is identified a loop is entered, the loop will continually remove the highest ranked item from the hierarchy with the lower similarity value. This continues until the first index in the current node's hierarchy in the hierarchy it is either: Unique or has the highest similarity value of all it's duplicates. Figure 3 represents the first phase where all hierarchies are built, Figure 4 represents the hierarchies once duplicates are eliminated.
+Exclusive match builds a hierarchy of matches ordered by similarity as the nodes are compared. Each difference type is assigned its corresponding value and these are summed to form the similarity value, due to the nature of the parser two ASTs can contain vastly different keys despite not being extremely different in nature on occasion, so an upper boundary has been set as a maximum difference punishment value. Once all hierarchies have been built, the uniqueness of the first item in each hierarchy is then tested with other duplicates. If a duplicate is identified a loop is entered, the loop will continually remove the highest ranked item from the hierarchy with the lower similarity value. This continues until the first index in the current node's hierarchy in the hierarchy it is either: Unique or has the highest similarity value of all it's duplicates. Figure 3 represents the first phase where all hierarchies are built, Figure 4 represents the hierarchies once duplicates are eliminated.
 
 
 \begin{algorithm}
@@ -377,8 +377,6 @@ Exclusive match builds a hierarchy of matches ordered by similarity as the nodes
 \includegraphics[width=0.50\textwidth]{allhierarchies}
 \end{figure}
 
-
-
 \begin{figure}[h]
 \caption{The hierarchies with pruned duplicates}
 \centering
@@ -387,31 +385,31 @@ Exclusive match builds a hierarchy of matches ordered by similarity as the nodes
 
 Upon completion, populated hierarchies are summed and stored including their similarity values. Empty hierarchies are not simply ignored, these items are identified and their count is used as a modifier to multiple $S$ (The similarity value) by (where a lower $S$ represents greater similarity).  
 
-To make $S$ relative to its size of the nodes that generated it the total $S$ of each function is divided by the number of keys present in all of its nodes. Key-count is always directly proportionate to the comparison as deep-diff works on the basis of comparing each individual key in the node. What this does mean however is that more complicated nodes are weighted heavier in the generation of $S$ but this was seen as appropriate.
+To make $S$ relative to its size of the nodes that generated it the total $S$ of each function is divided by the number of keys present in all of its nodes. Key-count is always directly proportionate to the comparison as deep-diff works on the basis of comparing each individual key in the node. What this does mean however is that more complicated nodes are weighted heavier in the generation of $S$ but this was judged to be appropriate.
 
-Once a score is generated for a function in the form \texttt{compare(a, b)} only one side of the comparison has taken place and the system is unilateral. This result is weighted as 50\% and the other half is derived from an inverse comparison for \texttt{compare(b, a)}.
+Once a score is generated for a function in the form \texttt{compare(a, b)} only one side of the comparison has taken place and the system must compare bilaterally. This result is weighted as 50\% and the other half is derived from an inverse comparison (\texttt{compare(b, a)}).
 
+Currenty $S$ is 0 when code excerpts are identical, JeSSE has been tweaked so that 1 is regarded as dissimiliar although there is no upper bound. This is not immediately coherent to volunteer engineers and hence a new Transformed Similarity Value $TS$ is used. This value should be intuitive to the engineers any knowledge of the system and hence a roughly percentage based system is used, with 100\% being considered the most similiar. Although it should be noted that a $TS$ of 75 is not 75\% similar, it was judged this is representative enough that engineers will get the general idea and use the values relatively. As $S$ values greater than 1 are dissimilar the system will complete the percentage illusion  by displaying this as 0. 
+If these values are displayed in such a manner have the possibility of having a difference value greater than 1? This is because as the most similar integration must still be selected i.e. a dissimilar function of similar length is still considered more similar than the contrary. The alternative of providing a $TS$ to the engineer of -56 was judged to be confusing and break the percentage-based illusion, after all how could the code be -56\% similar. $TS$ for each method is displayed alongside a visual indicator of similarity client-side and a copy of the most similar code to allow the developer to inspect it to look for places they could complete their task differently. 
 
-The purpose of this transformation is so the engineers perceive the value as a percentage, this should intuitive to the engineers without much thought. Although it should be noted that a $TS$ of 75 is not 75\% similar, it was judged this is representative enough that engineers will get the general idea of the system. JeSSE has been tweaked so an $S$ greater than 1 is seen to be very dissimilar and will be displayed to volunteer and \textit{Tomorrow} engineers alike as 0. If these values are displayed in such a way why even give multiple pieces of code the possibility of having a difference value less than 0? This is because as the most similar integration must still be selected i.e. a dissimilar function of similar length is still considered more similar than the contrary. Providing a $TS$ to the engineer of -56 was judged to be confusing and break the percentage-based illusion, after all how could the code be -56\% similar. $TS$ for each method is displayed alongside a visual indicator of similarity client-side and a copy of the most similar code to allow the developer to inspect it to look for places they could complete their task differently. 
-
-Each method of each integration undergoes the comparison process with the volunteer engineer's code, matching each function to the corresponding interface function. After every function has been assessed the code is imported from the most similar integration for each interface function, to prevent memory leaks these modules must be deleted. First emitted to the client-side to reduce further waiting time and then the modules are removed from the cache.
+Each method of each integration undergoes the comparison process with the volunteer engineer's code, matching each of their interface functions to the corresponding interface functions of other integrations. After every function has been assessed the code is imported from the most similar integration for each interface function, to prevent memory leaks these modules must be deleted. First the response is emitted to the client-side to reduce client-server latency and then the modules are removed from the cache.
 
 \clearpage
 
 \section{TIDE Implementation}
 \subsection{Code Execution}
-There are many ways to dynamically execute code in JavaScript, one of which is the notorious \texttt{eval()}, many of the reasons eval is widely disliked is due to its security implications, not particularly concerning to TIDE. However,  it also runs into many efficiency concerns. Meawad \cite{Meawad2012} asserted that \texttt{eval()} is, in almost every scenario, replaceable by a superior alternative, even developing a tool that automatically replaced 97\% of eval usage. There are many alternatives to \texttt{eval}, some are assessed below.
+There are many ways to dynamically execute code in JavaScript, one of which is the notorious \texttt{eval()}, many of the reasons eval is widely disliked is due to its security implications, not particularly concerning to TIDE. However,  it also runs into many efficiency concerns. Meawad \cite{Meawad2012} asserted that \texttt{eval()} is, in almost every scenario, replaceable by a superior alternative, even developing a tool that automatically replaced 97\% of eval usage. There are many alternatives to \texttt{eval()}, some are assessed below.
 
 \begin{itemize}
   		\setlength\itemsep{-0.2em}
 		\item JavaScript provides a text parameter for its Function class allowing the passing of source code directly into the object, i.e. \texttt{new Function(“console.log(‘test’)”).apply()} prints \texttt{test} in the console. This appears to be a thinly veiled eval it is not quite, the code input here is parsed into a JavaScript Function whereas eval runs the input expression with whatever scope it is called in. The issue with passing code in only functions can be passed in whereas the volunteer developers code entire modules with constants and imports which will not have the correct scope inside a wrapper function.
-		\item Another strategy is by Document Object Model modification, this would involve appending the script to the HTML of the current page their viewing and then running the methods from the JavaScript initially provided, besides the fact this solution is inelegant and would likely be very error-prone there are additional reasons why this should not be used. The first of which is it would require their browser to support the JavaScript they are writing, although this may seem like a reasonable request it is not unlikely some experimental feature is used for some element of their integration that is not supported by many old versions of browsers. Finally, there are numerous modules which may be imported from the \textit{Tomorrow} project which would be programmatically awkward to selectively provide based on the DOM. 
+		\item Another strategy is by Document Object Model modification, this would involve appending the script to the HTML of the current page their viewing and then running the methods from the JavaScript initially provided, besides the fact this solution is inelegant and would likely be very error-prone there are additional reasons why this should not be used. The first of which is it would require their browser to support the JavaScript they are writing, although this may seem like a reasonable request it is not unlikely some experimental feature could be used for some element of their integration that is not supported by many old versions of browsers. Finally, there are numerous modules which may be imported from the \textit{Tomorrow} project which would be programmatically awkward to selectively provide based on the DOM. 
 		\item Although node.js is a JavaScript framework perhaps it is better practice to write the code to a file stored on the backend and then initiate JavaScript execution via the command line using a tool such as Google’s V8 JavaScript interpreter. However, retrieving the console output is regarded to be inconsistent and cannot possibly be the best solution.
-		\item The final and perhaps only viable idea is to provide the code to the backend, write it to a file, treat the file as a normal module and import it. This must be synchronous of course due to the race condition of the file being populated. But once this is complete the code will be indistinguishable from a module imported on boot, allowing for the full capabilities of a module. Meaning the results do not need to be parsed or converted, they will natively retrieve JSON objects that can be directly sent to the client.
+		\item The final and perhaps only viable route is to provide the code to the backend, write it to a file, treat the file as a  module and import it. This must be synchronous of course due to the race condition of the file being populated. But once this is complete the code will be indistinguishable from a module imported on boot, allowing for the full capabilities of a module. Meaning the results do not need to be parsed or converted, they will natively retrieve JSON objects that can be directly sent to the client.
 		
 	\end{itemize}
 	
-			Once the module importing option was decided upon a new problem arose in order to allow execution of all valid JavaScript, the system must support also support ES2015+ syntax. However, node.js does not yet have full native support for all these features \cite{node.js2019}. One solution to this is transpiling the code, from ES2015+ to ES2015 as ES2015+ does not add any feature to the language which cannot be replicated in more verbose ES2015 \cite{Silva2017}, which is fully supported by node.js. However, transpiling comes at a cost, all code must be transformed before execution this is in most cases a trivial issue as all code is transpiled at the beginning. In this circumstance as ES6 features are supported in the IDE every single code execution must be transpiled to ES2015 to run, a non-trivial performance cost. Another and perhaps better solution to this is via the use of ESM, a module loader that transforms ECMAScript2015+ modules at run time rather than transpiling them \cite{powers2018}. This can be added to the entire system via simply running the server's root JavaScript file through the ESM module loader rather than directly. The elegance of this solution comes from the issue that the server itself uses ES16+ syntax,  the ESM module loader combats both this and the issue of ES16+ in integrations simultaneously.
+			Once the module importing option was decided upon a new problem arose in order to allow execution of all valid JavaScript, the system must support also support ES2015+ syntax. However, node.js does not yet have native support for all these features \cite{node.js2019}. One solution to this is transpiling the code, from ES2015+ to ES2015, as ES2015+ does not add any feature to the language which cannot be replicated in more verbose ES2015 \cite{Silva2017}, which is fully supported by node.js. However, transpiling comes at a cost, all code must be transformed before execution this is in most cases a trivial issue as all code is transpiled at the beginning. In this circumstance as ES6 features are supported in the IDE every single code execution must be transpiled to ES2015 to run, a non-trivial performance cost. Another and perhaps better solution to this is via the use of ESM, a module loader that transforms ECMAScript2015+ modules at run time rather than transpiling them \cite{powers2018}. This can be added to the entire system via simply running the server's root JavaScript file through the ESM module loader rather than directly. The elegance of this solution comes from the issue that the server itself uses ES16+ syntax,  the ESM module loader combats both this and the issue of ES16+ in integrations simultaneously.
 			
 				\begin{figure}[h]
 \caption{The Code Execution flow}
@@ -421,11 +419,11 @@ There are many ways to dynamically execute code in JavaScript, one of which is t
 			
 			Figure 5 represents the phases each code execution passes through when an execution request is sent from the user. This was achieved using a promise chain, of course, some items on the list are conditional, i.e. a user package is only created if one currently does not exist. The environment is set up as an empty module exporting the fields specified by the user as a JSON Object. Additionally, in order for the stub to have its methods made accessible,  code specifying all interface functions as exports is appended.
 
-All integrations imported with ES2015 dependency management system, rather than with ES16. However, the integrations themselves may import the modules using whichever syntax the volunteer engineer chooses, this is facilitated by the ESM module loader.  ES15+ \texttt{import} statement specifically makes the dependency cache inaccessible during run-time.  Even with ES2015's require, modules are cached and even if it is explicitly stated that the module should be reimported node will simply retrieve this cached version. In order to facilitate dynamic hot-loading multiple times in a session, the system must resolve the cached module and dereference it, it can then be re-imported. 
+All integrations imported with ES2015 dependency management system, rather than with ES16. However, the integrations themselves may import the modules using whichever syntax the volunteer engineer chooses, this is facilitated by the ESM module loader.  ES15+ \texttt{import} statement specifically makes the dependency cache inaccessible during run-time.  With ES2015's require, modules are cached even if it is explicitly stated that the module should be reimported node will simply retrieve this cached version. In order to facilitate dynamic hot-loading (loading the changes to an integration multiple times in a session), the system must resolve the cached module and dereference it, it can then be re-imported. 
 
-Once imported the module's interface functions are executed, feeding them arguments identical to what they receive in tomorrow. The \texttt{connect} interface method receives parameters in the form of two functions, the first of which is the app fetches the username and password of the current user. In the IDE the volunteer engineer must instead fill out an authentication panel. The other method requests a web view to be resolved for OAuth, discussed later. 
+Once imported the module's interface functions are executed, feeding them arguments identical to what they receive in \textit{Tomorrow}. The \texttt{connect} interface method receives parameters in the form of two functions, the first of which is the app fetches the username and password of the current user. In the IDE the volunteer engineer must instead fill out an authentication panel. The other method requests a web view to be resolved for OAuth, discussed later. 
 
-The outcome of the connect method is stored and then passed as the state parameter into collect, once this is complete the remainder of the operations benefit greatly from node.js's asynchronous nature. The calculation of code similarity, the transformation of the \texttt{collect} result in various representations and fetching the logs takes place simultaneously. These results are emitted to the client.
+The outcome of the \texttt{connect} method is stored and then passed as the state parameter into \texttt{collect}, once this is complete the remainder of the operations benefit greatly from node.js's asynchronous nature. The calculation of code similarity, the transformation of the \texttt{collect} result in various representations and fetching the logs takes place simultaneously. These results are emit to the client.
 \subsection{Miscellaneous Features}
 \subsubsection{Concurrency}
 To allow many volunteer developers to access the system simultaneously, each user will be assigned a unique id as a cookie upon their first entry into the site, this id is used to generate their session package. A user package has all the necessary file components for one to develop: their simulated environment and the module, user packages are persistent as long as their corresponding cookie is, meaning that their code is stored on the server rather than locally on the browser. These ids must be generated in such a way that it is extremely unlikely one user should be able to guess the id of another user to interfere with their integration, because of this a Universally Unique Identifier (UUID) is used.
@@ -433,20 +431,20 @@ To allow many volunteer developers to access the system simultaneously, each use
 \subsubsection{Logging and Debugging}
 For TIDE to see any long-form use, it must provide adequate information for debugging. This presents an issue and is clear why a virtual machine is used in the case of some web IDEs, the execution of the code is controlled by a server with a console that is not accessible. If volunteer developers are to have any idea why their code is not behaving as expected, they must have a means of receiving error messages or retrieving values in the program. Execution state, whether successful or otherwise is provided to the volunteer engineer using pop-ups, if no meaning error name can be found the message “an error occurred but not message could be retrieved appears” this was judged to be better than no message at all.
 
-To implement logging a very simple class was made available to the user, they simply import a logger class from the project files (a path is specified in the IDE documentation) and then build a stack of logs by calling functions within the logger. Typical logging levels are provided such as ‘info’, ‘debug’, etc. To access these logs and return them to the client-side, a logger is then added to the export function of the aforementioned module stub. However, due to the fact, the logger's presence is not guaranteed an additional line must be appended to the module exports, the contents of "logger" whether present or not and exports that instead.
+To implement logging a very simple class was made available to the user, they simply import a class (\texttt{Logger}) from the project files (a path is specified in the IDE documentation) and use \texttt{logger.log("level", "Message")}. Typical logging levels are provided such as \texttt{info},\texttt{debug}, etc. To access these logs and return them to the client-side, a logger is then added to the export function of the aforementioned module stub. However, due to the fact, the logger's presence is not guaranteed an additional line must be appended to the module exports, the contents of \texttt{logger} whether present or not and exports that instead.
 
 \subsubsection{Execution Results}
 Once the user has executed their integration they must be able to view the results, several display formats will be returned to the user. The first of which is a graph mapping the co2 usage over time allowing them to visualise their data as a time-series. Next cumulative co2 emissions will be mapped using an appropriate carbon model (provided by Tomorrow) to see if their results are reasonable. Finally, their data will be returned in raw JSON, the response the programmer might expect to see initially. 
 
 \subsubsection{OAuth}
-Volunteer engineers are able to use OAuth in their integration, this is where the differences in the nature of server-based code execute become more evident. In order to initially resolve the web view to a value, i.e. a session token, the volunteer engineer must often enter values into this web view. This, of course, presents an issue as their code is tested on the node.js server making the volunteer engineer entirely unable to continue this process and leaving the system frozen. 
+Volunteer engineers are able to use OAuth in their integration, this is where the differences in the nature of server-based code execute become more evident. In order to initially resolve details from authenication, i.e. a session token, the volunteer engineer must often enter values into this web view (i.e. a Google login). This, of course, presents an issue as integration code tests are executed server-side meaning the volunteer engineer is entirely unable to continue this process and would cause the system to freeze. 
 
-The OAuth flow was implemented with the use of WebSockets, the request is initially sent via HTTP to the backend which will then begin the execution cycle as normal. Once the connect interface method is called a well-formed OAuth integration authorisation takes place via a web view,  a promise is set up on the server that emits a signal to a receiving client-side WebSocket. On receiving this transmission the client creates a new window using the URL provided by the server, providing a means for the volunteer engineer to enter their authentication information. Once the user has logged in to the window (this can also take place automatically if details are stored) the server-side promise resolves as it receives a response from the client and can continue execution with valid authentication.
+The OAuth flow was implemented with the use of WebSockets, the request is initially sent via HTTP to the backend which will then begin the execution cycle as normal. Once the \texttt{connect} interface method is called a well-formed OAuth integration authorisation takes place via a Web view shown in their default browser, a promise is set up on the server that emits a signal to a receiving client-side WebSocket. On receiving this transmission the client creates a new window using the URL provided by the server, providing a means for the volunteer engineer to enter their authentication information. Once the user has logged in to the window (this can also take place automatically if details are stored) the server-side promise resolves as it receives a response from the client and can continue execution with valid authentication.
 
 \subsubsection{State Injection}
-Some volunteer developers may not want to run the \texttt{connect} component of their system on occasion, this may be to probe the system for a bug or perhaps because their API has a finite number of calls not well-suited to the development of the system. The \textit{Tomorrow} application itself will also rarely authenticate, instead opting to store this information where possible, hence engineers may be interested in testing the more likely circumstance of connection state already existing. 
+Some volunteer developers may not want to run the \texttt{connect} component of their system on occasion, this may be to probe the system for a bug or perhaps because their API has a quota which will be quickly expended in the development of the system. The \textit{Tomorrow} application itself will also rarely authenticate, instead opting to store this information where possible, hence engineers may be interested in testing the more likely circumstance of connection state already existing. 
 
-In a client-side modal, volunteer engineers can specify well-formed JSON (enforced by component) that is passed as a parameter with the code into the server. If this state injection is present the server bypasses the execution of certain features and instead only executes the \texttt{collect} method, using the state provided. This may also be convenient for providing expired tokens for testing.
+In a client-side pop up, volunteer engineers can specify well-formed JSON (enforced by component) that is passed as a parameter with the code into the server. If this state injection is present the server bypasses the execution of certain features and instead only executes the \texttt{collect} method, using the state provided. This may also be convenient for providing expired tokens for testing.
 
 \subsection{Testing}
 System testing is primarily focussed on the code similarity element of the project. This is a perfect domain for unit testing, the comparison engine produces an output of a float ($S$) indicating the two functions are considered identical. Many of the requirements of JeSSE are specified in such phrasing as “the inclusion of x should not affect the outcome of the comparison”, because of these tests could be created in such a manner. Some such tests include:
@@ -461,13 +459,13 @@ System testing is primarily focussed on the code similarity element of the proje
 		\item Lambda expression content flattened
 		\item Logging nodes are ignored
 		\item Comments are ignored
-		\item Called functions are inlined
+		\item Called member functions are inlined
 	\end{itemize}
 
 \clearpage
 
 \section{Hyperparameter Tuning}
-The final phase of optimising JeSSE involves tuning various numeric hyperparameters. (1) The Missing modifier increment, for each missing match increase a modifier by this value, this modifier is ultimately multiplied with the similarity score. This is used as it was judged to be logically more effective in identifying similarity, for every missing line the code becomes less and less likely to be largely similar. (2) Difference values, the similarity punishment value assigned to a specific difference type. (3) The maximum punishment value one node can receive, some nodes can be so expansive punishment values are disproportionate see Listing 4 \& 5.
+The final phase of optimising JeSSE involves tuning various numeric hyperparameters. (1) The Missing modifier increment, for each missing match (an empty match hiearchy after removal of duplicates) increase a modifier by this value, this modifier is ultimately multiplied with the similarity score. This is used as it was judged to be logically more effective in identifying similarity, for every missing node the code becomes less and less likely to be largely similar. (2) Difference values, the similarity punishment value assigned to a specific difference type. (3) The maximum punishment value one node can receive, some nodes can be so expansive punishment values are disproportionate see Listing 4 \& 5.
 
 \begin{lstlisting}[caption=Function returning contents of previous call expression]
 function sleepTest() {
@@ -486,10 +484,10 @@ function sleepTest() {
 
 \end{lstlisting}
 
-If no maximum punishment value is set here, due to the manner that JeSSE recursively evaluates nodes even inside of call expressions this produces an $TS$ of 30, which has been regarded as disproportionately low for such a change. A naive solution to this is to say why not treat all numeric operations and such as one numeric literal, the calculation in listing 4 is trivial and present for clarity sake but in real integrations, it is unlikely all calculations will be deterministic.
+If no maximum punishment value is set here, due to the manner that JeSSE recursively evaluates nodes even inside of call expressions this produces an $TS$ of 30, which has been regarded as disproportionately low for such a minor structural change. A naive solution is to treat all numeric operations and such as one numeric literal, the calculation in listing 4 is trivial and present for clarity sake but in real integrations, it is unlikely all calculations will be deterministic and in many other circumstances such a calculation may be a perfectly acceptable reason to increase $S$.
 
 \subsubsection{Combinatorial Tuning}
-Although there is little doubt an approach of assessing combinatorial parameters thoroughly  would lead to the system functioning more effectively, due to the oracle problem brought about as a result of the problem of similarity an enormous amount of manual work. This will be discussed further later on.
+Although there is little doubt an approach of assessing combinatorial parameters thoroughly  would lead to the system functioning more effectively, due to the oracle problem brought about as a result of the \textit{problem of similarity} an enormous amount of manual work. This will be discussed further later on.
 
 \subsection{Test Suite 1}
 A test consists of comparison between $n$a and $n$b
@@ -511,7 +509,7 @@ A test consists of comparison between $n$a and $n$b
 	}
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Comparison 4a - Effect of numeric literal vs numberic expression]
+\begin{lstlisting}[caption=Comparison 4a - Effect of numeric literal against numeric expression]
 	let x = true;
 	if (x) {
 		return 50;
@@ -519,7 +517,7 @@ A test consists of comparison between $n$a and $n$b
 	return 0;
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Comparison 4b - Effect of numeric literal vs numberic expression]
+\begin{lstlisting}[caption=Comparison 4b - Effect of numeric literal against numeric expression]
 	let x = true;
 	if (x) {
 		return 25 * 2;
@@ -537,7 +535,7 @@ A test consists of comparison between $n$a and $n$b
 	return superagent.get(url);
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Comparison 6a - Real integration connect bodies]
+\begin{lstlisting}[caption=Comparison 6a - Real integration connect bodies (dissimiliar)]
     const { username, password } = await requestLogin();
     const { customerId } = await getUser(username, password);
     const associatedMeteringPoints = await getMeteringPointAssociated(
@@ -559,7 +557,7 @@ A test consists of comparison between $n$a and $n$b
     };
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Comparison 6b - Real integration connect bodies]
+\begin{lstlisting}[caption=Comparison 6b - Real integration connect bodies (dissimiliar)]
  const { username, password } = await requestLogin();
  await logIn(username, password);
  return {
@@ -612,7 +610,7 @@ A test consists of comparison between $n$a and $n$b
 	};
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Comparison 8a - Functing call vs inlining]
+\begin{lstlisting}[caption=Comparison 8a - Functioning call vs inlining]
 function a() {
 	let value = 50;
 	return b(value);
@@ -627,7 +625,7 @@ function b(value) {
 }
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Comparison 8b]
+\begin{lstlisting}[caption=Comparison 8b - - Functioning call vs inlining]
 function c() {
 	let value = 50;
 	if (x > y) {
@@ -657,7 +655,7 @@ function c() {
 \end{lstlisting}
 \subsubsection{Maximum Punishment Value - Test Suite 1}
 
-\textbf{Table 2} - $MPV$ Refers to Maximum Punishment Value, the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
+\textbf{Table 2} - $MPV$ Refers to Maximum Punishment Value, the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$.
 
 \renewcommand{\arraystretch}{1.5}
 
@@ -686,14 +684,12 @@ function c() {
 \end{tabular}
 \end{center}
 
-The $MPV$ results are as expected, as the value rises so do the values of certain tests such as comparison 6, however it eventually reaches its true value at 3.6 within minor adjustments the same can be said for comparison 2. However, for some tests MPV was concealing a much higher difference value generated by the system, in both tests 4 \& 9 a S of >0.1  is observed, this is considered to be very similar, but MPV was concealing the fact that before this stage the system judges the items to be  very dissimiliar. Although MPV is certainly useful in certain circumstances it was removed due to the fact it could be used as a crutch to conceal issues with JeSSE. 
+The $MPV$ results are as expected, as the value rises so does $S$ of certain tests such as comparison 6, however it eventually reaches its "true value" at 3.6 within minor adjustments the same can be said for comparison 2. For some tests MPV was concealing a much higher difference value generated by the system, in both tests 4 \& 9 a $S$ of >0.1  is observed, this is considered to be very similar, but $MPV$ was concealing the fact that before this stage the system judges the items to be  very dissimiliar. Although $MPV$ is certainly useful in certain circumstances it was removed due to the fact it could be used as a crutch to conceal initial issues with JeSSE. 
 
-Diff values encounter the same issue as the aformentioned issue of combinatorial testing, in order to drastically reduce the number of permutations a number of assumptions were made. (1) New and Deletion are considered equivalent, this is due to the \textit{eventually bilateral} nature of the system. (2) The diff values were judged to have these relative weights New \& Deletion > Edit > Array Change || New \& Deletion > Array Change > Edit.
+Difference values encounter the same issue as the aformentioned issue of combinatorial testing, in order to drastically reduce the number of permutations a number of assumptions were made. (1) The "New" and "Deletion" difference types are considered equivalent, this is due to the \textit{eventually bilateral} nature of the system. (2) The diff values were judged to have these relative weights New \& Deletion > Edit > Array Change || New \& Deletion > Array Change > Edit. Using these constraints vastly decreased the number of total possiblities.
 
-\subsubsection{Diff Values - Test Suite 1}
-
-\textbf{Table 3} - Each letter in the diff value represents the difference type (D)eletion, (N)new, (E)dit, (A)rray Change. the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
-
+\subsubsection{Difference Values - Test Suite 1}
+\textbf{Table 3} - Each letter in the diff value represents the difference type (D)eletion, (N)new, (E)dit, (A)rray Change. the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$.
 
 \setlength{\tabcolsep}{2pt}
 \renewcommand{\arraystretch}{1.5}
@@ -718,9 +714,9 @@ Diff values encounter the same issue as the aformentioned issue of combinatorial
 \end{tabular}
 \end{center}
 
-The diff values have a much greater effect on $S$ as might be anticipated as whereas $MPV$ influences the maximum value, the diff values are the fundamental constituent of S. It is fair to say diff value tuning could be much more thorough, however, the limitations of this have already been discussed.
+The difference values have a much greater effect on $S$ as might be anticipated as whereas $MPV$ influences the maximum value, the difference values are the fundamental constituent of $S$. It is fair to say difference value tuning could be much more thorough, however, the limitations of this have already been discussed.
 
-This initial tuning attempt involved the code comparisons created to assess the effectiveness of JeSSE vs MOSS (Listings 6 to 21) known as Test Suite 1, however, once these were optimised (see table 2 \& 3 ) real comparison of integrations were judged to perform poorly. Before missing modifier tuning took place it was decided that Test Suite 1 should only be used for the purpose it was created for, that is comparing JeSSE to MOSS. Test Suite 2 was created using real integration comparison (albeit altered), it additionally came with a heuristic to improve the ability to optimise: The first 4 tests (10-13) must be greater than 1 but ideally as low as possible, the final 3 tests (14-16) should be as close to 0 as possible.
+This initial tuning attempt involved the code comparisons initially created to assess the effectiveness of JeSSE vs MOSS (Listings 6 to 21) known as Test Suite 1, however, once these were optimised (see table 2 \& 3 ) comparison of integrations running on integrations were judged to perform poorly. Before missing modifier tuning took place it was decided that Test Suite 1 should only be used for the purpose it was created for, that is comparing JeSSE to MOSS. Test Suite 2 was created using mostly real integration code excerpts (albeit  altered), additionally a heuristic was developed to improve the ability to optimise: The first 4 tests of test suite 2 (10-13) must be greater than 1 but ideally as low as possible, the final 3 tests (14-16) should be as close to 0 as possible. 
 
 \subsection{Test Suite 2}
 
@@ -931,8 +927,8 @@ const username = fetchUsername();
 
 \begin{lstlisting}[caption=Comparison 14b - barry.js connect against barry.js connect with addition lines added. These lines are inserted on row 16]
 ...
-	const { asd, asdf } = REGION_TO_LOCATION[priceRegion];
-	const { locatiosdfnLon, locatisdfonLat } = REGION_TO_LOCATION[priceRegion];
+	const { test1, test2 } = REGION_TO_LOCATION[priceRegion];
+	const { test3, test4 } = REGION_TO_LOCATION[priceRegion];
 	...
 \end{lstlisting}
 \begin{lstlisting}[caption=Comparison 15a - barry.js connect against ]
@@ -1036,13 +1032,13 @@ const username = fetchUsername();
 		state: { ...state, lastFullyCollectedDay }
 	};
 \end{lstlisting}
-\begin{lstlisting}[caption=Comparison 16a]
+\begin{lstlisting}[caption=Comparison 16a - semantically equivalent, structurally dissimiliar]
 values = values.map(v => {
 		return v % 2 === 0 ? v * 2 : v;
 	});
 	return values;
 \end{lstlisting}
-\begin{lstlisting}[caption=Comparison 16b]
+\begin{lstlisting}[caption=Comparison 16b - - semantically equivalent, structurally dissimiliar]
 	for (v in values) {
 		if (values[v] % 2 === 0) values[v] = values[v] * 2;
 	}
@@ -1073,7 +1069,7 @@ values = values.map(v => {
 \end{tabular}
 \end{center}
 
-Initially the system was tuned using a linear increment, i.e. every line missing produces the same increase in $S$ simply by multiplying the difference by the modifier. It was eventually concluded that a linear increase of punishment was not representative of code similarity. Despite the perceived improvements on the test suite of using a very low modifier, it was found to be logically unsound. Similar excerpts of code are unlikely to be exactly the same size, instead as this difference increases each additional line added decreases the likelihood of similarity, hence it was sensible to instead use an exponential function with the use of the exponent seen in the table.  Despite of the fact this produces arguably worse results using the heuristic on test suite 2 (performing worse in some comparisons and better in others) it is believe this will more accurately relay similarity.If a much greater set of test data was available perhaps purely empirically driven assessment would be more viable, however due to these limitations a more reasoned approach must be taken, despite what story the data may tell. 
+Initially the system was tuned using a linear increment, i.e. every line missing produces the same increase in $S$ simply by multiplying the difference by the modifier. It was eventually concluded that a linear increase of punishment was not representative of code similarity. Despite the perceived improvements on the test suite of using a very low modifier, it was found to be logically unsound. Similar excerpts of code are unlikely to be exactly the same size, instead as this difference increases each additional line added decreases the likelihood of similarity (i.e. not linear), hence it was sensible to instead use an exponential function with the use of the exponent seen in the table.  Despite of the fact this produces arguably worse results using the heuristic on test suite 2 (performing worse in some comparisons and better in others) it is believe this will more accurately relay similarity when used on a wider range of comparisons. If a much greater set of test data was available perhaps purely empirically driven assessment would be more viable, however due to these limitations a more reasoned approach must be taken, despite what story the data may tell. 
 
 \subsubsection{Modifier Criticism}
 One may make the argument that the effectiveness of the system is determined more on how similar the length of the two code excerpts is rather than their content. Some experiments were ran which address these concerns. Figure 6 \& 7 demonstrate respectively correlation between node difference and $S$, the x axis are calculated as: \[\dfrac{Base Node Count }{Compare Node Count}\] \[\dfrac{Base Key Count }{Compare Key Count}\]
@@ -1090,9 +1086,9 @@ One may make the argument that the effectiveness of the system is determined mor
 \includegraphics[width=0.50\textwidth]{keycount}
 \end{figure}
 
-Although generally a greater similarity in length of both keys and nodes in more similar code comparison can be observed, this perhaps what we would expect. The strength of this correlation has not been judged to be worrying and it is by no means the primary weight in comparison, in fact test 13 was engineered to have both identical node count and identical key count, this actually has the highest rate of dissimilarity in both Figure 6 \& 7. Hopefully dismissing the aforementioned concerns.
+Although generally a greater similarity in length of both keys and nodes in more similar code comparison can be observed, this perhaps what we would expect. The strength of this correlation has not been judged to be worrying and it is by no means the primary weight in comparison, in fact test 13 was engineered to have both identical node count and identical key count despite having dissimiliar content, test 13 has the highest rate of dissimilarity in both Figure 6 \& 7. Hopefully dismissing the aforementioned concerns.
 
-\subsection{Diff Values - Test Suite 2}
+\subsection{Difference Values - Test Suite 2}
 \textbf{Table 3} - Each letter in the diff value represents the difference type (D)eletion, (N)new, (E)dit, (A)rray Change. the number column headings refer to the JavaScript comparisons listed above. The cells are populated with the resulting $S$
 
 \setlength{\tabcolsep}{1pt}
@@ -1116,7 +1112,7 @@ Although generally a greater similarity in length of both keys and nodes in more
 \end{tabular}
 \end{center}
 
-Enough has been said about diff values, the results are arranged in the order of heuristic effectiveness and the final row was chosen. In the case of test 16 which should ideally yield as $S$ of 0 this will be discussed as a limitation.
+Enough has been said about difference values, the results are arranged in the order of heuristic effectiveness and the final row was chosen. In the case of test 16 which should ideally yield as $S$ of 0 this will be discussed as a limitation of JeSSE.
 
 \clearpage
 
@@ -1124,17 +1120,17 @@ Enough has been said about diff values, the results are arranged in the order of
 \subsection{JeSSE MOSS Differences}
 To not unfairly malign either comparison system first their differences must be established so they can be accounted for in comparison.  MOSS does not identify plagiarism this is impossible, even a 100\% score on MOSS does not mean plagiarism has taken place, it is simply an indication. As MOSS was aimed to identify plagiarism even after students obfuscate code it functions differently than JeSSE which aims to identify similarities. Volunteer engineers, unlike assessed students,  have no incentive to hide if they have copied code.
 
-Another feature of plagiarism is that often code is directly copied meaning lines may be identical other than some trivial changes to attempt to disguise this, volunteer engineers are not anticipated to copy, therefore JeSSE has been engineered to be more liberal in its similarity identification than it’s plagiarism detecting counterparts. MOSS JavaScript JeSSE differences: 
+Another feature of plagiarism is that often code is directly copied meaning lines may be identical other than some trivial changes to attempt to disguise this, volunteer engineers are not anticipated to copy in this manner, therefore JeSSE has been engineered to be more liberal in its similarity identification than it’s plagiarism detecting counterparts. MOSS:JavaScript - JeSSE differences: 
 
 \begin{itemize}
   \setlength\itemsep{-0.5em}
-  \item MOSS checks comments whereas JeSSE ignores them completely 
-  \item MOSS cannot find any similarity between let/const declarations
+  \item MOSS accounts for comments whereas JeSSE ignores them completely 
+  \item MOSS cannot find any similarity between \texttt{let}/\texttt{const} declarations
   \item MOSS works on a percentage basis, with 100\% being the most similar. However this does not mean identical code will yield a 100\% rating. The longer the matching n-gram found the higher this value is.
   \item JeSSE's Transformed Similarity $TS$ works on a basis where 100 is the most similar and has no lower boundary, anything below 0 is displayed as 0. Although it should be remembered this is not percentage based, simply for similarity in comparison and clarity to engineers. 
 \end{itemize}
 
-To homogenise the comparison somewhat, MOSS's unilateral similarity values have been averaged as occurs in JeSSE. Additionally JeSSE's $TS$ value will be used rather than $S$ this more closely resembles MOSS's similarity value. These comparisons are not to discredit one system and bolster the reputation of the other, they are simply to see how they compare in the circumstances relevant to JeSSE. As mentioned previously, test suite 1 (Listing 6 - 21) was designed for the comparison of JeSSE and MOSS.
+To homogenise the comparison somewhat, MOSS's unilateral similarity values have been averaged at weights of 50\% each as occurs in JeSSE. Additionally JeSSE's $TS$ value will be used rather than $S$ this more closely resembles MOSS's similarity value. These comparisons are not to discredit one system and bolster the reputation of the other, they are simply to see how they compare in the circumstances relevant to JeSSE. As mentioned previously, test suite 1 (Listing 6 - 21) was designed for the comparison of JeSSE and MOSS.
 
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.5}
@@ -1151,9 +1147,9 @@ To homogenise the comparison somewhat, MOSS's unilateral similarity values have 
 \end{tabular}
 \end{center}
 
-In test 1 some idea of how the systems compare, MOSS yields a 75\% score and JeSSE a 100 score for identical code. If this code is expanded to its state in 3 we see that the MOSS value increases to 91\% whereas JeSSE remains at its maximum similarity value of 100. If now symmetry is broken  of the compare functions where the systems differ becomes evident, in test 4 semantically equivalent code is compared MOSS finds “no matches” which will be referred to as 0\% after this point, whereas JeSSE's AST based comparison although somewhat thrown off by a few additional nodes yields at 72.3 similarity. The "program smell" these code excerpts are extremely similar and JeSSE has successfully managed to identify this similarity more successfully than MOSS. 
+In test 1 some idea of how the systems compare, MOSS yields a 75\% score and JeSSE a 100 score for identical code. If this code is expanded to its state in 3 we see that the MOSS value increases to 91\% whereas JeSSE remains at its maximum similarity value of 100. If now symmetry is broken  of the compare functions where the systems differ becomes evident, in test 4 semantically equivalent code is compared MOSS finds “no matches” which will be referred to as 0\% after this point, whereas JeSSE's AST based comparison although somewhat thrown off by a few additional nodes yields at 72.3 similarity. The "program smell" these code excerpts are extremely similar and JeSSE has successfully managed to identify this similarity. 
 
-In test 5 a somewhat realistic hyper-simplified version of what may be seen in integration is present, both systems perform excellency in identifying the similarity here. All of the aforementioned comparisons have been working to identify short similar code, what if both systems are fed longer and much more dissimilar code? In test 6  code that shares minorly similarities but is generally very different is fed to the systems, both of these functions are taken from real integrations. Both systems identify this successfully with each provided its lowest score possible. 7 is an example with real applicability, the body of an integration (barry.js) is compared with itself but with its order scrambled. Even though the code in both functions is identical other than location, MOSS yields 0\% at all whereas JeSSE identifies a 100\% match. In test 6 the benefits of function inlining are visible, MOSS yields that there is no match between the two pieces of code, whereas JeSSE identifies that there is a strong similarity at 66. The 34 difference arises from the additional return statement (see Listing 35) along with the expression \texttt{b(value)}.
+In test 5 a somewhat realistic simplified version of what may be seen in integration is present, both systems perform excellency in identifying the similarity here. All of the aforementioned comparisons have been working to identify short similar code, what if both systems are fed longer and much more dissimilar code? In test 6  code that shares minorly similarities but is generally very different is fed to the systems, both of these functions are taken from real integrations. Both systems identify this successfully with each provided its lowest score possible. 7 is an example with real applicability, the body of an integration (barry.js) is compared with itself but with its order scrambled. Even though the code in both functions is identical other than location, MOSS yields 0\% whereas JeSSE identifies a 100\% match. In test 6 the benefits of function inlining are visible, MOSS yields that there is no match between the two pieces of code, whereas JeSSE identifies that there is a strong similarity at 66. The 34 difference arises from the additional return statement (see Listing 35) along with the expression \texttt{b(value)}.
 
 \begin{lstlisting}[caption= Test 6 with function inlined]
 	let value = 50;
@@ -1183,7 +1179,7 @@ Despite this rate of increase appearing minorly worrying it should be noted that
 \subsection{Limitations}
  In test 16 reveals a limitation of JeSSE, it cannot equate deprecated ECMAScript with new ECMAScript. As although these two code excerpts are identical in purpose they produce nodes with different keys, which is what the entirety of JeSSE functions off, although this provides great flexibility of the system in many circumstances it also limits it in this regard. Another example of where JeSSE performs poorly is in dissimilar code that performs a similar purpose, as JeSSE does not execute code this is a potential avenue for expansion.
  
- Combinatorial tuning of hyperparameters is highly desirable, a convincing argument can be made that the current tuning strategy is flimsy and biased although the use of a heuristic has helped with this. Tuning one parameter at a time leads to the issue that the parameters are agnostic to the other parameters, even if missing modifier calculation values are removed entirely all this will achieve is optimising diff values under that circumstance, there is no guarantee that the tuning performed under this circumstance holds up very effectively. However, the heuristic provided has ultimately been significantly improved so it is regarded as having some improvement even if perhaps the hyperparameters are far from their optimal values.  Ultimately this down to the oracle problem brought about as a result of the problem of similarity.
+ Combinatorial tuning of hyperparameters is highly desirable, a convincing argument can be made that the current tuning strategy is flimsy and biased although the use of a heuristic has somewhat addressed this. Tuning one parameter at a time leads to the issue that the parameters are agnostic to the other parameters, even if missing modifier calculation values are removed entirely, all this will achieve is optimising the chosen difference values under that specific circumstance, there is no guarantee that the tuning performed under this circumstance holds up effectively. However, the heuristic provided has ultimately been significantly improved so it is regarded as having some improvement even if perhaps the hyperparameters are far from their optimal values.  Ultimately this down to the oracle problem brought about as a result of the \texttt{problem of similarity}.
  
 \subsection{TIDE}
 TIDE offers a domain-specific-feature rich lightweight web IDE. The system supports, as specified, all variants of JavaScript execution and has never been found to take more than 3000 ms to execute when the latency is within reasonable bounds. TIDE is regarded to be a significant improvement over the previous developer playground and with the now built-in code similarity features, it is believed it will have a non-trivial reduction on the difficulty of developing an integration.
@@ -1192,7 +1188,7 @@ TIDE offers a domain-specific-feature rich lightweight web IDE. The system suppo
 \section{Future Work}
 
 \subsection{JeSSE}
- JeSSE effectively identifies similar functions much like modern plagiarism tools, human input is still required to see if such similarities are sensible. The next steps for JeSSE could involve finding very similar subtrees seen in many integrations and then providing both volunteer and \textit{Tomorrow} engineers with the ability to view “suggested templates”. Volunteer engineers could verbatim insert these templates into their code and edit them however they see fit.  \textit{Tomorrow} Engineers could then perhaps consider adding them to some form of “templates library” allowing future engineers to browse these before implementing anything themselves, essentially reducing the boilerplate code required for the volunteer engineers to write. 
+ JeSSE effectively identifies similar functions much like modern plagiarism tools, human input is still required to see if such similarities are sensible. The next steps for JeSSE could involve finding very similar subtrees seen in many integrations and then providing both volunteer and Tomorrow engineers with the ability to view “suggested templates”. Volunteer engineers could verbatim insert these templates into their code and edit them however they see fit.  Tomorrow Engineers could then perhaps consider adding them to some form of “templates library” allowing future engineers to browse these before implementing anything themselves, essentially reducing the boilerplate code required for the volunteer engineers to write. 
 
 In the not so distant future perhaps many more engineers may see a template library built into their IDE hooked up to some monolithic database offering them suggestions on how other engineers have solved a similar problem. Either from their companies codebase or a global repository.
 
