@@ -1032,13 +1032,13 @@ const username = fetchUsername();
 		state: { ...state, lastFullyCollectedDay }
 	};
 \end{lstlisting}
-\begin{lstlisting}[caption=Comparison 16a - semantically equivalent, structurally dissimiliar]
+\begin{lstlisting}[caption=Comparison 16a - semantically equivalent structurally dissimiliar]
 values = values.map(v => {
 		return v % 2 === 0 ? v * 2 : v;
 	});
 	return values;
 \end{lstlisting}
-\begin{lstlisting}[caption=Comparison 16b - - semantically equivalent, structurally dissimiliar]
+\begin{lstlisting}[caption=Comparison 16b - - semantically equivalent structurally dissimiliar]
 	for (v in values) {
 		if (values[v] % 2 === 0) values[v] = values[v] * 2;
 	}
